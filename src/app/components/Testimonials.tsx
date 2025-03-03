@@ -85,6 +85,8 @@ export default function Testimonials() {
                 <div className="flex items-center">
                   <Image
                     className="h-12 w-12 rounded-full"
+                    width={50}
+                    height={50}
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.name}
                   />

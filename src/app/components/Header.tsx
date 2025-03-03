@@ -90,7 +90,7 @@ export default function Header() {
               Sign up <ChevronRight size={16} className="ml-1" />
             </Link>
             <Button
-              className="md:hidden p-2 rounded-full bg-accent hover:bg-accent/80 transition-colors duration-200"
+              className="md:hidden p-2 rounded-full bg-primary hover:bg-accent/80 transition-colors duration-200"
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
