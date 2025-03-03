@@ -37,7 +37,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            Makes dieting and reaching your goal physique easy. Customized for your caloric goals and needs.
+            Makes dieting and reaching your goal physique easy. Customized Recipes for your caloric goals and needs.
           </motion.p>
           <motion.div
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
@@ -60,11 +60,11 @@ export default function Hero() {
         <motion.div
           className="absolute -top-1/2 -left-1/2 w-full h-full bg-primary/10 dark:bg-primary/20 rounded-full"
           animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 90, 0],
+            scale: [1, 1.05, 1],
+            rotate: [0, 180, 0],
           }}
           transition={{
-            duration: 20,
+            duration: 15,
             repeat: Number.POSITIVE_INFINITY,
             ease: "linear",
           }}
@@ -72,11 +72,11 @@ export default function Hero() {
         <motion.div
           className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-secondary/10 dark:bg-secondary/20 rounded-full"
           animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, -90, 0],
+            scale: [1, 1.05, 1],
+            rotate: [0, -180, 0],
           }}
           transition={{
-            duration: 25,
+            duration: 15,
             repeat: Number.POSITIVE_INFINITY,
             ease: "linear",
           }}
@@ -84,11 +84,11 @@ export default function Hero() {
         <motion.div
           className="absolute top-1/4 left-1/4 w-12 h-12 bg-primary/20 dark:bg-primary/30 rounded-full"
           animate={{
-            y: [0, -20, 0],
-            x: [0, 20, 0],
+            y: [0, -10, 0],
+            x: [0, 10, 0],
           }}
           transition={{
-            duration: 5,
+            duration: 3,
             repeat: Number.POSITIVE_INFINITY,
             ease: "easeInOut",
           }}
@@ -96,11 +96,11 @@ export default function Hero() {
         <motion.div
           className="absolute bottom-1/4 right-1/4 w-8 h-8 bg-secondary/20 dark:bg-secondary/30 rounded-full"
           animate={{
-            y: [0, 30, 0],
-            x: [0, -30, 0],
+            y: [0, 15, 0],
+            x: [0, -15, 0],
           }}
           transition={{
-            duration: 7,
+            duration: 4,
             repeat: Number.POSITIVE_INFINITY,
             ease: "easeInOut",
           }}

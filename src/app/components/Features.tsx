@@ -1,5 +1,5 @@
 "use client"
-import { Zap, Layers, Users, TrendingUp } from "lucide-react"
+import { Zap, Layers, Apple, Dumbbell, Calculator } from "lucide-react"
 import { motion } from "framer-motion"
 
 const features = [
@@ -9,19 +9,19 @@ const features = [
     icon: Zap,
   },
   {
-    name: "Intuitive Interface",
-    description: "A user-friendly interface that's easy to navigate, making your work more efficient.",
-    icon: Layers,
+    name: "Food Recommendations",
+    description: "Seamlessly choose from a variety of delicious foods while maintaining a diet.",
+    icon: Apple,
   },
   {
-    name: "Team Collaboration",
-    description: "Seamlessly work together with your team members in real-time.",
-    icon: Users,
+    name: "Workout Tracker",
+    description: "A user-friendly interface that's easy to navigate, making tracking your workouts more efficient.",
+    icon: Dumbbell,
   },
   {
-    name: "Advanced Analytics",
-    description: "Gain valuable insights with our powerful analytics and reporting tools.",
-    icon: TrendingUp,
+    name: "Calorie Calculator",
+    description: "Gain valuable insights into your body and how much you should eat to reach your goal.",
+    icon: Calculator,
   },
 ]
 
@@ -74,7 +74,7 @@ export default function Features() {
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            Everything you need to streamline your workflow
+            Everything you need to become the best version of yourself
           </motion.p>
           <motion.p
             className="mt-4 max-w-2xl text-xl text-muted-foreground lg:mx-auto"
@@ -83,8 +83,8 @@ export default function Features() {
             transition={{ duration: 0.5, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            StreamLine offers a comprehensive set of features designed to boost your productivity and simplify your
-            business processes.
+            Macrotrue offers a comprehensive set of features designed to boost your productivity and simplify your
+            diet.
           </motion.p>
         </div>
 

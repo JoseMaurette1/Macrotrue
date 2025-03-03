@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Moon, Sun, Menu, X, ChevronRight } from "lucide-react"
 import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -23,8 +24,8 @@ export default function Header() {
 
   const menuItems = [
     { href: "#features", label: "Features" },
-    { href: "#testimonials", label: "Testimonials" },
     { href: "#pricing", label: "Pricing" },
+    { href: "#testimonials", label: "Testimonials" },
   ]
 
   return (
@@ -68,12 +69,14 @@ export default function Header() {
             transition={{ duration: 0.5 }}
             className="flex items-center space-x-4"
           >
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-full bg-accent hover:bg-accent/80 transition-colors duration-200"
+              className="p-2 rounded-full  hover:bg-accent/80 transition-colors duration-200"
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+            </Button>
             <Link
               href="/login"
               className="hidden sm:inline-flex text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
@@ -86,13 +89,13 @@ export default function Header() {
             >
               Sign up <ChevronRight size={16} className="ml-1" />
             </Link>
-            <button
+            <Button
               className="md:hidden p-2 rounded-full bg-accent hover:bg-accent/80 transition-colors duration-200"
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+            </Button>
           </motion.div>
         </div>
       </div>

@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -68,7 +67,7 @@ export default function CalorieCalculator() {
     localStorage.setItem('calculatedCalories', JSON.stringify({
       weightLoss: getCaloriesByGoal(tdee, -500),
       mildWeightLoss: getCaloriesByGoal(tdee, -250),
-      maintenance: getCaloriesByGoal(tdee, 0),
+      maintenanceCalories: getCaloriesByGoal(tdee, 0), // Changed from Maintenance to Maintenance Calories
       weightGain: getCaloriesByGoal(tdee, 500)
     }));
     router.push('/');
@@ -77,13 +76,6 @@ export default function CalorieCalculator() {
   return (
     <Card className="w-full max-w-2xl mx-auto p-10">
       <CardHeader className="relative">
-        <Button
-          variant="ghost"
-          className="absolute left-0 top-0 p-2"
-          onClick={handleSaveAndReturn}
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </Button>
         <CardTitle className="text-2xl font-bold text-center">Calorie Calculator</CardTitle>
       </CardHeader>
       <CardContent>
@@ -201,7 +193,7 @@ export default function CalorieCalculator() {
                 const system = height ? "metric" : "us";
                 const tdee = calculateTDEE(system);
                 return (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 ">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -223,7 +215,7 @@ export default function CalorieCalculator() {
                     >
                       <Card className="transition-all hover:scale-105">
                         <CardHeader>
-                          <CardTitle className="text-base">Mild Weight Loss (0.5 lb/week)</CardTitle>
+                          <CardTitle className="text-base">Mild Loss (0.5 lb/week)</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <p className="text-lg">{getCaloriesByGoal(tdee, -250)} calories</p>
@@ -237,7 +229,7 @@ export default function CalorieCalculator() {
                     >
                       <Card className="transition-all hover:scale-105">
                         <CardHeader>
-                          <CardTitle className="text-base">Maintenance</CardTitle>
+                          <CardTitle className="text-base">Maintain Weight</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <p className="text-lg">{getCaloriesByGoal(tdee, 0)} calories</p>
@@ -251,7 +243,7 @@ export default function CalorieCalculator() {
                     >
                       <Card className="transition-all hover:scale-105">
                         <CardHeader>
-                          <CardTitle className="text-base">Weight Gain (1 lb/week)</CardTitle>
+                          <CardTitle className="text-base">Weight Gain</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <p className="text-lg">{getCaloriesByGoal(tdee, 500)} calories</p>

@@ -4,24 +4,24 @@ import { motion } from "framer-motion"
 const testimonials = [
   {
     name: "Ashley Lopez",
-    role: "CEO at TechCorp",
+    role: "College Student",
     image: "/placeholder.svg?height=400&width=400",
     quote:
-      "StreamLine has revolutionized our workflow. It's intuitive, powerful, and has significantly boosted our team's productivity.",
+      "Macrotrue has revolutionized the way I diet. I have finally been able to stay consistent with the proper Recipes catered towards my caloric needs.",
   },
   {
     name: "Jose Maurette",
-    role: "Ceo of Gym",
+    role: "Father of 2",
     image: "/placeholder.svg?height=400&width=400",
     quote:
-      "The analytics features in StreamLine have provided us with invaluable insights. It's been a game-changer for our marketing strategies.",
+      "The Workout Tracker in Macrotrue has allowed me to increase in weight in all my exercises. It's been a game-changer for me in the gym.",
   },
   {
     name: "Max Gleibermann",
-    role: "Gooning Director at Roblox",
+    role: "College Student",
     image: "/placeholder.svg?height=400&width=400",
     quote:
-      "The collaboration tools in StreamLine have made remote work seamless for our team. It's an essential part of our daily operations now.",
+      "Macrotrues specialized diet plan has helped me lose 50 pounds. Dieting has never been easier than with Macrotrue.",
   },
 ]
 
@@ -64,9 +64,9 @@ export default function Testimonials() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Trusted by businesses worldwide</h2>
+          <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Trusted by customers worldwide</h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            Here's what our satisfied customers have to say about StreamLine
+            Here's what our satisfied customers have to say about <span className="text-primary">Macro</span><span className="text-foreground">true</span>
           </p>
         </motion.div>
         <div className="mt-16 grid gap-8 lg:grid-cols-3">

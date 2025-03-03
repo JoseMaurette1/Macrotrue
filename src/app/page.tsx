@@ -13,7 +13,7 @@ export default function Home() {
   <Header/>
   <Hero/>
   <Features/>
-  <CalorieCalculator/>
+  <div className="bg-background pb-5"><CalorieCalculator/></div>
   <Testimonials/>
   <Pricing/>
   <CTA/>

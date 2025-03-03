@@ -7,27 +7,27 @@ const plans = [
   {
     name: "Starter",
     price: "Free",
-    features: ["5 team members", "Basic analytics", "24/7 support", "10GB storage"],
+    features: ["Calorie Calculator", "3 Daily Recipe Recommendations", "Basic Analytics"],
   },
   {
     name: "Premium",
-    price: "$5",
+    price: "$3",
     features: [
-      "Unlimited team members",
-      "Advanced analytics",
+      "Calorie Calculator",
+      "Unlimited Recipe Recommendations",
       "Priority support",
-      "100GB storage",
-      "Custom integrations",
+      "Advanced Analytics",
     ],
   },
   {
     name: "Pro",
-    price: "$15",
+    price: "$10",
     features: [
-      "Unlimited everything",
-      "Dedicated account manager",
+      "Calorie Calculator",
+      "Unlimited Recipe Recommendations",
+      "24/7 Support",
+      "Access to Workout Tracker App",
       "Custom feature development",
-      "On-premise deployment option",
     ],
   },
 ]
@@ -72,7 +72,7 @@ export default function Pricing() {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Simple, transparent pricing</h2>
-          <p className="mt-4 text-xl text-muted-foreground">Choose the plan that's right for your business</p>
+          <p className="mt-4 text-xl text-muted-foreground">Choose the plan that's right for you.</p>
         </motion.div>
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
           {plans.map((plan, index) => (
@@ -83,7 +83,7 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: "0 10px 30px -15px rgba(0, 0, 0, 0.2)" }}
+              whileHover={{ y: -5, boxShadow: "0 10px 30px -15px rgba(0, 0, 0, 0.2)", border: "2px solid" }}
             >
               <div className="p-6">
                 <h3 className="text-lg font-medium text-foreground">{plan.name}</h3>
