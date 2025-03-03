@@ -59,18 +59,18 @@ export default function CalorieCalculator() {
     return Math.round(tdee + adjustment - 200); // Subtracting 200 to adjust the calorie calculations
   };
 
-  const handleSaveAndReturn = () => {
-    const system = height ? "metric" : "us";
-    const tdee = calculateTDEE(system);
-    // Save calories to localStorage before redirecting
-    localStorage.setItem('calculatedCalories', JSON.stringify({
-      weightLoss: getCaloriesByGoal(tdee, -500),
-      mildWeightLoss: getCaloriesByGoal(tdee, -250),
-      maintenanceCalories: getCaloriesByGoal(tdee, 0), // Changed from Maintenance to Maintenance Calories
-      weightGain: getCaloriesByGoal(tdee, 500)
-    }));
-    router.push('/');
-  };
+  // const handleSaveAndReturn = () => {
+  //   const system = height ? "metric" : "us";
+  //   const tdee = calculateTDEE(system);
+  //   // Save calories to localStorage before redirecting
+  //   localStorage.setItem('calculatedCalories', JSON.stringify({
+  //     weightLoss: getCaloriesByGoal(tdee, -500),
+  //     mildWeightLoss: getCaloriesByGoal(tdee, -250),
+  //     maintenanceCalories: getCaloriesByGoal(tdee, 0), // Changed from Maintenance to Maintenance Calories
+  //     weightGain: getCaloriesByGoal(tdee, 500)
+  //   }));
+  //   router.push('/');
+  // };
 
   return (
     <Card className="w-full max-w-2xl mx-auto p-10">

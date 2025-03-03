@@ -15,14 +15,14 @@ const testimonials = [
     role: "Father of 2",
     image: "/placeholder.svg?height=400&width=400",
     quote:
-      "The Workout Tracker in Macrotrue has allowed me to increase in weight in all my exercises. It's been a game-changer for me in the gym.",
+      "The Workout Tracker in Macrotrue has allowed me to increase in weight in all my exercises. It&apos;s been a game-changer for me in the gym.",
   },
   {
     name: "Max Gleibermann",
     role: "College Student",
     image: "/placeholder.svg?height=400&width=400",
     quote:
-      "Macrotrues specialized diet plan has helped me lose 50 pounds. Dieting has never been easier than with Macrotrue.",
+      "Macrotrue&apos;s specialized diet plan has helped me lose 50 pounds. Dieting has never been easier than with Macrotrue.",
   },
 ]
 
@@ -67,7 +67,7 @@ export default function Testimonials() {
         >
           <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Trusted by customers worldwide</h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            Here's what our satisfied customers have to say about <span className="text-primary">Macro</span><span className="text-foreground">true</span>
+            Here&apos;s what our satisfied customers have to say about <span className="text-primary">Macro</span><span className="text-foreground">true</span>
           </p>
         </motion.div>
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
@@ -93,7 +93,7 @@ export default function Testimonials() {
                     <div className="text-sm text-muted-foreground">{testimonial.role}</div>
                   </div>
                 </div>
-                <p className="mt-4 text-muted-foreground italic">"{testimonial.quote}"</p>
+                <p className="mt-4 text-muted-foreground italic">&apos;{testimonial.quote}&apos;</p>
               </div>
             </motion.div>
           ))}
