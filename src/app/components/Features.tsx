@@ -1,5 +1,5 @@
 "use client"
-import { Zap, Layers, Apple, Dumbbell, Calculator } from "lucide-react"
+import { Zap, Apple, Dumbbell, Calculator } from "lucide-react"
 import { motion } from "framer-motion"
 
 const features = [

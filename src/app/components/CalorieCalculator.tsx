@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 
 export default function CalorieCalculator() {
   const router = useRouter();
@@ -24,11 +23,11 @@ export default function CalorieCalculator() {
   const calculateBMR = (system: "metric" | "us") => {
     if (!weight || (!height && system === "metric") || (!feet && system === "us") || !age) return 0;
 
-    let heightInCm = system === "metric"
+    const heightInCm = system === "metric"
       ? parseFloat(height)
       : (parseFloat(feet) * 30.48) + (parseFloat(inches || "0") * 2.54);
 
-    let weightInKg = system === "metric"
+    const weightInKg = system === "metric"
       ? parseFloat(weight)
       : parseFloat(weight) * 0.453592;
 

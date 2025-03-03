@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Github, Twitter, Instagram, Linkedin } from "lucide-react"
+import { Github, Instagram, Linkedin } from "lucide-react"
 
 export default function Footer() {
   return (
