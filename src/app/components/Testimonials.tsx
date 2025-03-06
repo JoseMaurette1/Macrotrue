@@ -6,21 +6,21 @@ const testimonials = [
   {
     name: "Ashley Lopez",
     role: "College Student",
-    image: "/placeholder.svg?height=400&width=400",
+    image: "/ashley.jpeg",
     quote:
       "Macrotrue has revolutionized the way I diet. I have finally been able to stay consistent with the proper recipes catered towards my caloric needs.",
   },
   {
     name: "Jose Maurette",
     role: "Father of 2",
-    image: "/placeholder.svg?height=400&width=400",
+    image: "/jose.jpeg",
     quote:
       "The Workout Tracker in Macrotrue has allowed me to increase in weight in all my exercises. It has been a game-changer for me in the gym.",
   },
   {
     name: "Max Gleibermann",
     role: "College Student",
-    image: "/placeholder.svg?height=400&width=400",
+    image: "/max.jpeg",
     quote:
       "Macrotrues specialized diet plan has helped me lose 50 pounds. Dieting has never been easier than with Macrotrue.",
   },
