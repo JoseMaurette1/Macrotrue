@@ -59,7 +59,7 @@ const Page = () => {
 
         setMeals(formattedMeals);
         setLoading(false);
-      } catch (_err) {
+      } catch {
         setError("Failed to fetch meals");
         setLoading(false);
       }
