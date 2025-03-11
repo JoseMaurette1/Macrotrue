@@ -1,4 +1,7 @@
 "use client";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 interface Recipe {
@@ -23,7 +26,7 @@ interface Meal {
   image: string;
 }
 
-const page = () => {
+const Page = () => {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -56,7 +59,7 @@ const page = () => {
 
         setMeals(formattedMeals);
         setLoading(false);
-      } catch (err) {
+      } catch (_err) {
         setError("Failed to fetch meals");
         setLoading(false);
       }
@@ -80,50 +83,88 @@ const page = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Random Meals</h1>
-      <div className="mb-6 p-4 bg-primary/10 rounded-lg">
-        <h2 className="text-xl font-semibold mb-2">Total Macros</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div>
-            <p className="font-medium">Calories</p>
-            <p className="text-lg">{Math.round(totalMacros.calories)}cal</p>
-          </div>
-          <div>
-            <p className="font-medium">Protein</p>
-            <p className="text-lg">{Math.round(totalMacros.protein)}g</p>
-          </div>
-          <div>
-            <p className="font-medium">Carbs</p>
-            <p className="text-lg">{Math.round(totalMacros.carbs)}g</p>
-          </div>
-          <div>
-            <p className="font-medium">Fat</p>
-            <p className="text-lg">{Math.round(totalMacros.fat)}g</p>
-          </div>
-        </div>
-      </div>
-      <div className="grid gap-4">
-        {meals.map((meal, index) => (
-          <div key={index} className="border p-4 rounded-lg flex">
-            <img
-              src={meal.image}
-              alt={meal.name}
-              className="w-32 h-32 object-cover rounded-lg mr-4"
-            />
-            <div>
-              <h2 className="text-xl font-semibold">{meal.name}</h2>
-              <div className="mt-2">
-                <p>Calories: {Math.round(meal.calories)}cal</p>
-                <p>Protein: {Math.round(meal.protein)}g</p>
-                <p>Carbs: {Math.round(meal.carbs)}g</p>
-                <p>Fat: {Math.round(meal.fat)}g</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Card>
+        <CardHeader>
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
+          >
+            <CardTitle className="text-2xl font-bold">Random Meals</CardTitle>
+          </motion.div>
+        </CardHeader>
+        <CardContent>
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
+          >
+            <Card className="bg-primary/10">
+              <CardHeader>
+                <CardTitle className="text-xl">Total Macros</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div>
+                    <p className="font-medium">Calories</p>
+                    <p className="text-lg">
+                      {Math.round(totalMacros.calories)}cal
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Protein</p>
+                    <p className="text-lg">
+                      {Math.round(totalMacros.protein)}g
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Carbs</p>
+                    <p className="text-lg">{Math.round(totalMacros.carbs)}g</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Fat</p>
+                    <p className="text-lg">{Math.round(totalMacros.fat)}g</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="grid gap-4"
+          >
+            {meals.map((meal, index) => (
+              <Card key={index}>
+                <CardContent className="flex p-4">
+                  <Image
+                    src={meal.image}
+                    alt={meal.name}
+                    width={128}
+                    height={128}
+                    className="w-32 h-32 object-cover rounded-lg mr-4"
+                  />
+                  <div>
+                    <h2 className="text-xl font-semibold">{meal.name}</h2>
+                    <div className="mt-2">
+                      <p>Calories: {Math.round(meal.calories)}cal</p>
+                      <p>Protein: {Math.round(meal.protein)}g</p>
+                      <p>Carbs: {Math.round(meal.carbs)}g</p>
+                      <p>Fat: {Math.round(meal.fat)}g</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default page;
+export default Page;
