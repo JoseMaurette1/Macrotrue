@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-black">
       {/* Left Section */}
       <motion.div
         initial={{ opacity: 0, x: -100 }}
@@ -16,7 +16,7 @@ export default function SignUpPage() {
         className="relative hidden w-1/2 p-8 lg:block"
       >
         <div className="h-full w-full overflow-hidden rounded-[40px] bg-gradient-to-b from-[#9fccfa] via-[#0974f1] to-[#0974f1]">
-          <div className="flex h-full flex-col items-center justify-center px-8 text-center text-white">
+          <div className="flex h-full flex-col items-center justify-center bg-black px-8 text-center text-white">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
