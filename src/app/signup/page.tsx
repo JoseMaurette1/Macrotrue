@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="flex min-h-screen">
       {/* Left Section */}
       <motion.div
         initial={{ opacity: 0, x: -100 }}
@@ -15,8 +15,8 @@ export default function SignUpPage() {
         transition={{ duration: 0.5 }}
         className="relative hidden w-1/2 p-8 lg:block"
       >
-        <div className="h-full w-full overflow-hidden rounded-[40px] bg-gradient-to-b from-[#9fccfa] via-[#0974f1] to-[#0974f1]">
-          <div className="flex h-full flex-col items-center justify-center bg-black px-8 text-center text-white">
+        <div className="h-full w-full overflow-hidden rounded-[40px] bg-gradient-to-b from-[#2563eb] via-[#2563eb] to-[#2563eb]">
+          <div className="flex h-full flex-col items-center justify-center px-8 text-center text-white">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -81,7 +81,7 @@ export default function SignUpPage() {
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex w-full items-center justify-center bg-black p-6 lg:w-1/2"
+        className="flex w-full items-center justify-center bg-background p-6 lg:w-1/2"
       >
         <div className="w-full max-w-md rounded-[40px] p-12">
           <div className="mx-auto max-w-sm">
@@ -89,7 +89,7 @@ export default function SignUpPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-2 text-3xl font-bold text-white"
+              className="mb-2 text-3xl font-bold text-foreground"
             >
               Sign Up Account
             </motion.h2>
@@ -142,10 +142,10 @@ export default function SignUpPage() {
               className="relative mb-8"
             >
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-800"></div>
+                <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-black px-2 text-gray-400">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
               </div>
             </motion.div>
 
@@ -161,7 +161,7 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <Input
-                  className="h-12 border-gray-800 bg-gray-900 text-white placeholder:text-gray-400"
+                  className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="example1234@gmail.com"
                   type="email"
                 />
@@ -169,7 +169,7 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <Input
-                  className="h-12 border-gray-800 bg-gray-900 text-white placeholder:text-gray-400"
+                  className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="********"
                   type="password"
                 />
@@ -178,13 +178,13 @@ export default function SignUpPage() {
                 </p>
               </div>
 
-              <Button className="h-12 w-full bg-white text-black hover:bg-gray-100">
+              <Button className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90">
                 Sign Up
               </Button>
 
-              <p className="text-center text-sm text-gray-400">
+              <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <a href="/login" className="text-white hover:underline">
+                <a href="/login" className="text-foreground hover:underline">
                   Log in
                 </a>
               </p>

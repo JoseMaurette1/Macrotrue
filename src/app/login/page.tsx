@@ -12,7 +12,7 @@ export default function LoginPage() {
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex w-full items-center justify-center bg-black p-6"
+        className="flex w-full items-center justify-center bg-background p-6"
       >
         <div className="w-full max-w-md rounded-[40px] p-12">
           <div className="mx-auto max-w-sm">
@@ -20,7 +20,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-2 text-3xl font-bold text-white"
+              className="mb-2 text-3xl font-bold text-foreground"
             >
               Login to <span className="text-[#0974f1]">Macrotrue</span>
             </motion.h2>
@@ -73,10 +73,10 @@ export default function LoginPage() {
               className="relative mb-8"
             >
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-800"></div>
+                <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-black px-2 text-gray-400">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
               </div>
             </motion.div>
 
@@ -88,7 +88,7 @@ export default function LoginPage() {
             >
               <div className="space-y-2">
                 <Input
-                  className="h-12 border-gray-800 bg-gray-900 text-white placeholder:text-gray-400"
+                  className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="example1234@gmail.com"
                   type="email"
                 />
@@ -96,19 +96,19 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <Input
-                  className="h-12 border-gray-800 bg-gray-900 text-white placeholder:text-gray-400"
+                  className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="********"
                   type="password"
                 />
               </div>
 
-              <Button className="h-12 w-full bg-white text-black hover:bg-gray-100">
+              <Button className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90">
                 Login
               </Button>
 
-              <p className="text-center text-sm text-gray-400">
+              <p className="text-center text-sm text-muted-foreground">
                 Don&apos;t have an account?{" "}
-                <a href="/signup" className="text-white hover:underline">
+                <a href="/signup" className="text-foreground hover:underline">
                   Sign up
                 </a>
               </p>

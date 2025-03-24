@@ -1,16 +1,14 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
-import { Moon, Sun, Menu, X, ChevronRight } from "lucide-react"
-import { useTheme } from "next-themes"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Menu, X, Home, Calculator } from "lucide-react";
 
-export default function Header() {
+export default function MemberHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const { theme, setTheme } = useTheme()
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
@@ -23,9 +21,9 @@ export default function Header() {
   }, [])
 
   const menuItems = [
-    { href: "#features", label: "Features" },
-    { href: "#pricing", label: "Pricing" },
-    { href: "#testimonials", label: "Testimonials" },
+    { href: "/Home", label: "Home", icon: <Home size={16} /> },
+    { href: "/Calculator", label: "Calculator", icon: <Calculator size={16} /> },
+    { href: "/Food", label: "Food", icon: <Calculator size={16} /> },
   ]
 
   return (
@@ -55,9 +53,10 @@ export default function Header() {
               >
                 <Link
                   href={item.href}
-                  className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out px-4 py-2 group"
+                  className="relative flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out px-4 py-2 group"
                 >
-                  {item.label}
+                  {item.icon}
+                  <span className="ml-2">{item.label}</span>
                   <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out" />
                 </Link>
               </motion.div>
@@ -67,28 +66,8 @@ export default function Header() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center space-x-4"
+            className="flex items-center"
           >
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-full  hover:bg-accent/80 transition-colors duration-200"
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </Button> */}
-            <Link
-              href="/login"
-              className="hidden sm:inline-flex text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="hidden sm:inline-flex items-center text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-full transition-colors duration-200"
-            >
-              Sign up <ChevronRight size={16} className="ml-1" />
-            </Link>
             <Button
               className="md:hidden p-2 rounded-full bg-primary hover:bg-accent/80 transition-colors duration-200"
               onClick={toggleMenu}
@@ -113,28 +92,13 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="block text-base font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out px-4 py-2"
+                  className="flex items-center text-base font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out px-4 py-2"
                   onClick={toggleMenu}
                 >
-                  {item.label}
+                  {item.icon}
+                  <span className="ml-2">{item.label}</span>
                 </Link>
               ))}
-              <div className="pt-4 space-y-4">
-                <Link
-                  href="/login"
-                  className="block text-base font-medium text-foreground hover:text-primary transition-colors duration-200 px-4 py-2"
-                  onClick={toggleMenu}
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  className="flex items-center text-base font-medium text-primary bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-full transition-colors duration-200"
-                  onClick={toggleMenu}
-                >
-                  Sign up <ChevronRight size={16} className="ml-1" />
-                </Link>
-              </div>
             </div>
           </motion.div>
         )}
@@ -142,4 +106,3 @@ export default function Header() {
     </header>
   )
 }
-

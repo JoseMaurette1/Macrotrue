@@ -1,10 +1,12 @@
 import React from "react";
-import CalorieCalculator from "../components/CalorieCalculator";
+import Calculator from "../components/Calculator";
+import MemberHeader from "../components/MemberHeader";
 
 const page = () => {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <CalorieCalculator />
+      <MemberHeader />
+      <Calculator />
     </div>
   );
 };

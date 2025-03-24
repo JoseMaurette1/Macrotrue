@@ -25,7 +25,11 @@ export default function CalorieCalculator() {
   const [inches, setInches] = useState("");
   const [weight, setWeight] = useState("");
   const [activityLevel, setActivityLevel] = useState("sedentary");
-  const [selectedCalories, setSelectedCalories] = useState<number | null>(null);
+  const [selectedCalories, setSelectedCalories] = useState<number | null>(() => {
+    // Initialize from localStorage if available
+    const saved = localStorage.getItem("selectedCalories");
+    return saved ? parseInt(saved) : null;
+  });
 
   const calculateBMR = (system: "metric" | "us") => {
     if (
@@ -82,11 +86,17 @@ export default function CalorieCalculator() {
     return Math.round(tdee + adjustment - 200); // Subtracting 200 to adjust the calorie calculations
   };
 
+  const handleCardClick = (calories: number) => {
+    setSelectedCalories(calories);
+    localStorage.setItem("selectedCalories", calories.toString());
+    router.push('/Food');
+  };
+
   return (
     <Card className="w-full max-w-2xl mx-auto p-10">
       <CardHeader className="relative">
         <CardTitle className="text-2xl font-bold text-center">
-          Demo Calculator
+          Calorie Calculator
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -230,7 +240,9 @@ export default function CalorieCalculator() {
                             ? "ring-2 ring-primary"
                             : ""
                         }`}
-                        onClick={() => router.push('/signup')}
+                        onClick={() =>
+                          handleCardClick(getCaloriesByGoal(tdee, -500))
+                        }
                       >
                         <CardHeader>
                           <CardTitle className="text-base">
@@ -238,7 +250,7 @@ export default function CalorieCalculator() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-lg blur-sm">
+                          <p className="text-lg">
                             {getCaloriesByGoal(tdee, -500)} calories
                           </p>
                         </CardContent>
@@ -259,7 +271,9 @@ export default function CalorieCalculator() {
                             ? "ring-2 ring-primary"
                             : ""
                         }`}
-                        onClick={() => router.push('/signup')}
+                        onClick={() =>
+                          handleCardClick(getCaloriesByGoal(tdee, -250))
+                        }
                       >
                         <CardHeader>
                           <CardTitle className="text-base">
@@ -267,7 +281,7 @@ export default function CalorieCalculator() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-lg blur-sm">
+                          <p className="text-lg">
                             {getCaloriesByGoal(tdee, -250)} calories
                           </p>
                         </CardContent>
@@ -288,7 +302,9 @@ export default function CalorieCalculator() {
                             ? "ring-2 ring-primary"
                             : ""
                         }`}
-                        onClick={() => router.push('/signup')}
+                        onClick={() =>
+                          handleCardClick(getCaloriesByGoal(tdee, 0))
+                        }
                       >
                         <CardHeader>
                           <CardTitle className="text-base">
@@ -296,7 +312,7 @@ export default function CalorieCalculator() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-lg blur-sm">
+                          <p className="text-lg">
                             {getCaloriesByGoal(tdee, 0)} calories
                           </p>
                         </CardContent>
@@ -317,7 +333,9 @@ export default function CalorieCalculator() {
                             ? "ring-2 ring-primary"
                             : ""
                         }`}
-                        onClick={() => router.push('/signup')}
+                        onClick={() =>
+                          handleCardClick(getCaloriesByGoal(tdee, 500))
+                        }
                       >
                         <CardHeader>
                           <CardTitle className="text-base">
@@ -325,7 +343,7 @@ export default function CalorieCalculator() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-lg blur-sm">
+                          <p className="text-lg">
                             {getCaloriesByGoal(tdee, 500)} calories
                           </p>
                         </CardContent>

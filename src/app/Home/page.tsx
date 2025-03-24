@@ -2,14 +2,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Header from "../components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import MemberHeader from "../components/MemberHeader";
 const HomePage = () => {
   return (
     <div className="p-4">
-      <Header />
+      <MemberHeader />
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}

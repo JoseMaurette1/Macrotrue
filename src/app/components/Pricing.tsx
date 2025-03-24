@@ -16,6 +16,7 @@ const plans = [
   {
     name: "Premium",
     price: "$3",
+    popular: true,
     features: [
       "Calorie Calculator",
       "Unlimited Recipe Recommendations",
@@ -89,17 +90,37 @@ export default function Pricing() {
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
-              className="border border-border rounded-lg shadow-sm divide-y divide-border"
+              className="border border-border rounded-lg shadow-sm divide-y divide-border relative bg-card"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{
-                y: -5,
-                boxShadow: "0 10px 30px -15px rgba(0, 0, 0, 0.2)",
-                border: "2px solid",
+                scale: 1.02,
+                y: -8,
+                transition: {
+                  duration: 0.2,
+                  ease: "easeOut"
+                },
+                boxShadow: "0 20px 40px -15px rgba(0,0,0,0.2)",
+                border: "2px solid hsl(var(--primary))"
+              }}
+              whileTap={{
+                scale: 0.98
               }}
             >
+              {plan.popular && (
+                <motion.div
+                  className="absolute -top-4 left-1/2 transform -translate-x-1/2"
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                    Most Popular
+                  </span>
+                </motion.div>
+              )}
               <div className="p-6">
                 <h3 className="text-lg font-medium text-foreground">
                   {plan.name}
@@ -110,17 +131,28 @@ export default function Pricing() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   {plan.name === "Starter" ? "per month" : "per month"}
                 </p>
-                <Button className="mt-6 w-full">
-                  {plan.name === "Premium" ? "GET STARTED 💪" : "Get started"}
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Button className="mt-6 w-full">
+                    {plan.name === "Premium" ? "GET STARTED 💪" : "Get started"}
+                  </Button>
+                </motion.div>
               </div>
               <div className="px-6 pt-6 pb-8">
                 <h4 className="text-sm font-medium text-foreground tracking-wide uppercase">
                   What&apos;s included
                 </h4>
                 <ul className="mt-6 space-y-4">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start">
+                  {plan.features.map((feature, i) => (
+                    <motion.li
+                      key={feature}
+                      className="flex items-start"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * i }}
+                    >
                       <div className="flex-shrink-0">
                         <Check
                           className="h-6 w-6 text-green-500"
@@ -130,7 +162,7 @@ export default function Pricing() {
                       <p className="ml-3 text-sm text-muted-foreground">
                         {feature}
                       </p>
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
               </div>
