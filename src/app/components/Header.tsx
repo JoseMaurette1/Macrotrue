@@ -3,14 +3,12 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Moon, Sun, Menu, X, ChevronRight } from "lucide-react"
-import { useTheme } from "next-themes"
+import { Menu, X, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const { theme, setTheme } = useTheme()
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
@@ -69,14 +67,6 @@ export default function Header() {
             transition={{ duration: 0.5 }}
             className="flex items-center space-x-4"
           >
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-full  hover:bg-accent/80 transition-colors duration-200"
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </Button> */}
             <Link
               href="/login"
               className="hidden sm:inline-flex text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
@@ -142,4 +132,3 @@ export default function Header() {
     </header>
   )
 }
-
