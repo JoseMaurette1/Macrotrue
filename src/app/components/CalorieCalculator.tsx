@@ -25,7 +25,6 @@ export default function CalorieCalculator() {
   const [inches, setInches] = useState("");
   const [weight, setWeight] = useState("");
   const [activityLevel, setActivityLevel] = useState("sedentary");
-  const [selectedCalories, setSelectedCalories] = useState<number | null>(null);
 
   const calculateBMR = (system: "metric" | "us") => {
     if (
@@ -225,11 +224,7 @@ export default function CalorieCalculator() {
                       transition={{ duration: 0.5, ease: "easeOut" }}
                     >
                       <Card
-                        className={`transition-all hover:scale-105 cursor-pointer ${
-                          selectedCalories === getCaloriesByGoal(tdee, -500)
-                            ? "ring-2 ring-primary"
-                            : ""
-                        }`}
+                        className="transition-all hover:scale-105 cursor-pointer"
                         onClick={() => router.push('/signup')}
                       >
                         <CardHeader>
@@ -254,11 +249,7 @@ export default function CalorieCalculator() {
                       }}
                     >
                       <Card
-                        className={`transition-all hover:scale-105 cursor-pointer ${
-                          selectedCalories === getCaloriesByGoal(tdee, -250)
-                            ? "ring-2 ring-primary"
-                            : ""
-                        }`}
+                        className="transition-all hover:scale-105 cursor-pointer"
                         onClick={() => router.push('/signup')}
                       >
                         <CardHeader>
@@ -283,11 +274,7 @@ export default function CalorieCalculator() {
                       }}
                     >
                       <Card
-                        className={`transition-all hover:scale-105 cursor-pointer ${
-                          selectedCalories === getCaloriesByGoal(tdee, 0)
-                            ? "ring-2 ring-primary"
-                            : ""
-                        }`}
+                        className="transition-all hover:scale-105 cursor-pointer"
                         onClick={() => router.push('/signup')}
                       >
                         <CardHeader>
@@ -312,11 +299,7 @@ export default function CalorieCalculator() {
                       }}
                     >
                       <Card
-                        className={`transition-all hover:scale-105 cursor-pointer ${
-                          selectedCalories === getCaloriesByGoal(tdee, 500)
-                            ? "ring-2 ring-primary"
-                            : ""
-                        }`}
+                        className="transition-all hover:scale-105 cursor-pointer"
                         onClick={() => router.push('/signup')}
                       >
                         <CardHeader>
