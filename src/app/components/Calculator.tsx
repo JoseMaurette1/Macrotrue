@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,11 +25,14 @@ export default function CalorieCalculator() {
   const [inches, setInches] = useState("");
   const [weight, setWeight] = useState("");
   const [activityLevel, setActivityLevel] = useState("sedentary");
-  const [selectedCalories, setSelectedCalories] = useState<number | null>(() => {
-    // Initialize from localStorage if available
+  const [selectedCalories, setSelectedCalories] = useState<number | null>(null);
+
+  useEffect(() => {
     const saved = localStorage.getItem("selectedCalories");
-    return saved ? parseInt(saved) : null;
-  });
+    if (saved) {
+      setSelectedCalories(parseInt(saved));
+    }
+  }, []);
 
   const calculateBMR = (system: "metric" | "us") => {
     if (
