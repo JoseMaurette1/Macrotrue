@@ -55,13 +55,18 @@ export default function SignUpPage() {
     } catch (err: unknown) {
       console.error("Error during sign up:", err);
       const clerkError = err as ClerkError;
-      setError(clerkError.errors?.[0]?.message || "Something went wrong. Please try again.");
+      setError(
+        clerkError.errors?.[0]?.message ||
+          "Something went wrong. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOAuthSignUp = async (provider: "oauth_google" | "oauth_github") => {
+  const handleOAuthSignUp = async (
+    provider: "oauth_google" | "oauth_github"
+  ) => {
     if (!isLoaded) return;
 
     try {
@@ -69,7 +74,7 @@ export default function SignUpPage() {
       await signUp.authenticateWithRedirect({
         strategy: provider,
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/Home"
+        redirectUrlComplete: "/Home",
       });
     } catch (err: unknown) {
       console.error("OAuth error:", err);
@@ -227,7 +232,9 @@ export default function SignUpPage() {
                 <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or
+                </span>
               </div>
             </motion.div>
 
@@ -248,6 +255,7 @@ export default function SignUpPage() {
               className="space-y-6"
               onSubmit={handleSubmit}
             >
+              <div id="clerk-captcha"></div>
               <div className="space-y-2">
                 <Input
                   className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"

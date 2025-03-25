@@ -49,13 +49,18 @@ export default function LoginPage() {
     } catch (err: unknown) {
       console.error("Error during sign in:", err);
       const clerkError = err as ClerkError;
-      setError(clerkError.errors?.[0]?.message || "Something went wrong. Please try again.");
+      setError(
+        clerkError.errors?.[0]?.message ||
+          "Something went wrong. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOAuthSignIn = async (provider: "oauth_google" | "oauth_github") => {
+  const handleOAuthSignIn = async (
+    provider: "oauth_google" | "oauth_github"
+  ) => {
     if (!isLoaded) return;
 
     try {
@@ -63,7 +68,7 @@ export default function LoginPage() {
       await signIn.authenticateWithRedirect({
         strategy: provider,
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/Home"
+        redirectUrlComplete: "/Home",
       });
     } catch (err: unknown) {
       console.error("OAuth error:", err);
@@ -73,12 +78,81 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen">
+      {/* Left Section */}
+      <motion.div
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative hidden w-1/2 p-8 lg:block"
+      >
+        <div className="h-full w-full overflow-hidden rounded-[40px] bg-gradient-to-b from-[#2563eb] via-[#2563eb] to-[#2563eb]">
+          <div className="flex h-full flex-col items-center justify-center px-8 text-center text-white">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8"
+            >
+              <h1 className="text-2xl font-semibold">Macrotrue</h1>
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mb-6 text-4xl font-bold"
+            >
+              Welcome Back
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mb-12 text-lg"
+            >
+              Log in to continue tracking your fitness journey.
+            </motion.p>
+
+            <div className="w-full max-w-sm space-y-4">
+              {[1, 2, 3].map((step, index) => (
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                  className={`rounded-lg ${
+                    step === 1 ? "bg-white/10" : "bg-white/5"
+                  } p-4 backdrop-blur-sm`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span
+                      className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                        step === 1
+                          ? "bg-white text-black"
+                          : "bg-white/20 text-white"
+                      }`}
+                    >
+                      {step}
+                    </span>
+                    <span className="text-lg">
+                      {step === 1 && "Access your account"}
+                      {step === 2 && "Track your progress"}
+                      {step === 3 && "Achieve your goals"}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Right Section */}
       <motion.div
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex w-full items-center justify-center bg-background p-6"
+        className="flex w-full items-center justify-center bg-background p-6 lg:w-1/2"
       >
         <div className="w-full max-w-md rounded-[40px] p-12">
           <div className="mx-auto max-w-sm">
@@ -88,7 +162,7 @@ export default function LoginPage() {
               transition={{ delay: 0.2 }}
               className="mb-2 text-3xl font-bold text-foreground"
             >
-              Login to <span className="text-[#0974f1]">Macrotrue</span>
+              Log In Account
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: -20 }}
@@ -96,7 +170,7 @@ export default function LoginPage() {
               transition={{ delay: 0.3 }}
               className="mb-8 text-gray-400"
             >
-              Welcome back! Please enter your details.
+              Enter your credentials to access your account.
             </motion.p>
 
             <motion.div
@@ -152,7 +226,9 @@ export default function LoginPage() {
                 <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or
+                </span>
               </div>
             </motion.div>
 
@@ -202,7 +278,7 @@ export default function LoginPage() {
                 className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={isLoading || !isLoaded}
               >
-                {isLoading ? "Loading..." : "Login"}
+                {isLoading ? "Loading..." : "Log In"}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
