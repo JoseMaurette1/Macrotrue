@@ -4,8 +4,74 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Github } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSignIn } from "@clerk/nextjs";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ClerkError } from "../types/clerk";
 
 export default function LoginPage() {
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isLoaded) return;
+
+    try {
+      setIsLoading(true);
+      setError("");
+
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.push("/Home");
+      } else {
+        console.error("Sign in failed", result);
+        setError("Something went wrong. Please try again.");
+      }
+    } catch (err: unknown) {
+      console.error("Error during sign in:", err);
+      const clerkError = err as ClerkError;
+      setError(clerkError.errors?.[0]?.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthSignIn = async (provider: "oauth_google" | "oauth_github") => {
+    if (!isLoaded) return;
+
+    try {
+      setIsLoading(true);
+      await signIn.authenticateWithRedirect({
+        strategy: provider,
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/Home"
+      });
+    } catch (err: unknown) {
+      console.error("OAuth error:", err);
+      setError("Failed to authenticate with provider");
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <motion.div
@@ -39,7 +105,12 @@ export default function LoginPage() {
               transition={{ delay: 0.4 }}
               className="mb-8 grid gap-4"
             >
-              <Button variant="outline" className="h-12">
+              <Button
+                variant="outline"
+                className="h-12"
+                onClick={() => handleOAuthSignIn("oauth_google")}
+                disabled={isLoading || !isLoaded}
+              >
                 <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -60,7 +131,12 @@ export default function LoginPage() {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" className="h-12">
+              <Button
+                variant="outline"
+                className="h-12"
+                onClick={() => handleOAuthSignIn("oauth_github")}
+                disabled={isLoading || !isLoaded}
+              >
                 <Github className="mr-2 h-5 w-5" />
                 Github
               </Button>
@@ -80,17 +156,32 @@ export default function LoginPage() {
               </div>
             </motion.div>
 
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mb-4 text-sm text-red-500"
+              >
+                {error}
+              </motion.div>
+            )}
+
             <motion.form
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               className="space-y-6"
+              onSubmit={handleSubmit}
             >
               <div className="space-y-2">
                 <Input
                   className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="example1234@gmail.com"
                   type="email"
+                  value={email}
+                  onChange={handleEmailChange}
+                  disabled={isLoading || !isLoaded}
+                  required
                 />
               </div>
 
@@ -99,11 +190,19 @@ export default function LoginPage() {
                   className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="********"
                   type="password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  disabled={isLoading || !isLoaded}
+                  required
                 />
               </div>
 
-              <Button className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Login
+              <Button
+                type="submit"
+                className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={isLoading || !isLoaded}
+              >
+                {isLoading ? "Loading..." : "Login"}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">

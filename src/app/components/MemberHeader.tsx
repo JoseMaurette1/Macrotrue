@@ -43,39 +43,50 @@ export default function MemberHeader() {
               <span className="text-foreground">true</span>
             </Link>
           </motion.div>
-          <nav className="hidden md:flex space-x-1">
-            {menuItems.map((item, index) => (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link
-                  href={item.href}
-                  className="relative flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out px-4 py-2 group"
+
+          <div className="flex items-center gap-4">
+            <nav className="hidden md:flex space-x-1">
+              {menuItems.map((item, index) => (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  {item.icon}
-                  <span className="ml-2">{item.label}</span>
-                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out" />
-                </Link>
-              </motion.div>
-            ))}
-          </nav>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center"
-          >
-            <Button
-              className="md:hidden p-2 rounded-full bg-primary hover:bg-accent/80 transition-colors duration-200"
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
+                  <Link
+                    href={item.href}
+                    className="relative flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 ease-in-out px-4 py-2 group"
+                  >
+                    {item.icon}
+                    <span className="ml-2">{item.label}</span>
+                    <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out" />
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </Button>
-          </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex md:hidden items-center"
+            >
+              <Button
+                className="p-2 rounded-full bg-primary hover:bg-accent/80 transition-colors duration-200"
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </Button>
+            </motion.div>
+          </div>
         </div>
       </div>
       <AnimatePresence>
@@ -106,3 +117,4 @@ export default function MemberHeader() {
     </header>
   )
 }
+

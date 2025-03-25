@@ -5,7 +5,11 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MemberHeader from "../components/MemberHeader";
+import { useUser } from "@clerk/nextjs";
+
 const HomePage = () => {
+  const { user, isLoaded } = useUser();
+
   return (
     <div className="p-4">
       <MemberHeader />
@@ -21,9 +25,18 @@ const HomePage = () => {
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          Welcome to
-          <span className="text-primary ml-2">Macro</span>
-          <span className="text-foreground">true</span>
+          {isLoaded && user ? (
+            <>
+              Welcome back,{" "}
+              <span className="text-primary">{user.firstName || user.username || "Friend"}</span>!
+            </>
+          ) : (
+            <>
+              Welcome to
+              <span className="text-primary ml-2">Macro</span>
+              <span className="text-foreground">true</span>
+            </>
+          )}
         </motion.h1>
         <motion.p
           className="mt-4 text-xl text-center"
@@ -40,7 +53,7 @@ const HomePage = () => {
         >
           <Link href="/Calculator">
             <Button size="lg" className="mt-8">
-              Get Started <ArrowRight />
+              Get Started <ArrowRight className="ml-2" />
             </Button>
           </Link>
         </motion.div>
