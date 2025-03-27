@@ -225,53 +225,38 @@ export default function LoginPage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
+              <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
                   Or
                 </span>
               </div>
             </motion.div>
 
-            {error && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mb-4 text-sm text-red-500"
-              >
-                {error}
-              </motion.div>
-            )}
-
-            <motion.form
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="space-y-6"
-              onSubmit={handleSubmit}
-            >
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Input
-                  className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
-                  placeholder="example1234@gmail.com"
+                  id="email"
+                  placeholder="Email"
                   type="email"
                   value={email}
                   onChange={handleEmailChange}
-                  disabled={isLoading || !isLoaded}
                   required
+                  className="h-12"
                 />
               </div>
-
               <div className="space-y-2">
                 <Input
-                  className="h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
-                  placeholder="********"
+                  id="password"
+                  placeholder="Password"
                   type="password"
                   value={password}
                   onChange={handlePasswordChange}
-                  disabled={isLoading || !isLoaded}
                   required
+                  className="h-12"
                 />
               </div>
+
+              {error && <div className="text-sm text-red-500">{error}</div>}
 
               <Button
                 type="submit"
@@ -287,7 +272,7 @@ export default function LoginPage() {
                   Sign up
                 </a>
               </p>
-            </motion.form>
+            </form>
           </div>
         </div>
       </motion.div>
