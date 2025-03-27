@@ -99,7 +99,6 @@ const MealData = () => {
     dinner: 0,
   });
   const [refreshCount, setRefreshCount] = useState(0);
-  const [userTier, setUserTier] = useState("basic"); // Default to basic tier
 
   // Generate random meal indexes on initial load
   useEffect(() => {
@@ -121,8 +120,7 @@ const MealData = () => {
     setRefreshCount((prevCount) => prevCount + 1);
   };
 
-  const isRefreshDisabled =
-    refreshCount >= 1 && userTier !== "premium" && userTier !== "pro";
+  const isRefreshDisabled = refreshCount >= 1;
 
   const refreshButtonTitle = isRefreshDisabled
     ? "Upgrade to premium or pro to refresh more than once"
