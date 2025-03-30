@@ -1,5 +1,5 @@
 "use client"
-import { Button } from "@/components/ui/button"
+import { ShimmerButton } from "@/components/ui/shimmer-button"
 import { motion } from "framer-motion"
 
 export default function CTA() {
@@ -30,10 +30,13 @@ export default function CTA() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
           viewport={{ once: true }}
+          className="flex justify-center"
         >
-          <Button size="lg" variant="outline"  className="mt-8">
-            Get started for free
-          </Button>
+          <ShimmerButton className="mt-8 shadow-2xl">
+            <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+              Get started for free
+            </span>
+          </ShimmerButton>
         </motion.div>
       </div>
     </div>
