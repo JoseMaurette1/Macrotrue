@@ -233,7 +233,7 @@ export default function SignUpPage() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-background px-2 text-muted-foreground">
-                  Or
+                  OR
                 </span>
               </div>
             </motion.div>
