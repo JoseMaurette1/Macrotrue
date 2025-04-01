@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const plans = [
   {
@@ -38,6 +39,12 @@ const plans = [
 ];
 
 export default function Pricing() {
+  const router = useRouter();
+
+  const handleSignup = () => {
+    router.push("/signup");
+  };
+
   return (
     <div
       className="bg-background py-16 sm:py-24 relative overflow-hidden"
@@ -100,13 +107,13 @@ export default function Pricing() {
                 y: -8,
                 transition: {
                   duration: 0.2,
-                  ease: "easeOut"
+                  ease: "easeOut",
                 },
                 boxShadow: "0 20px 40px -15px rgba(0,0,0,0.2)",
-                border: "2px solid hsl(var(--primary))"
+                border: "2px solid hsl(var(--primary))",
               }}
               whileTap={{
-                scale: 0.98
+                scale: 0.98,
               }}
             >
               {plan.popular && (
@@ -135,7 +142,7 @@ export default function Pricing() {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <Button className="mt-6 w-full">
+                  <Button className="mt-6 w-full" onClick={handleSignup}>
                     {plan.name === "Premium" ? "GET STARTED 💪" : "Get started"}
                   </Button>
                 </motion.div>
