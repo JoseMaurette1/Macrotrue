@@ -3,120 +3,48 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-
-interface MacroNutrients {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
-interface Meal {
-  name: string;
-  portions: string;
-  macros: MacroNutrients;
-}
-
-interface MealCategory {
-  breakfast: Meal[];
-  lunch: Meal[];
-  dinner: Meal[];
-}
-
-export const mealData: MealCategory = {
-  breakfast: [
-    {
-      name: "Eggs and Toast",
-      portions: "3 large eggs (150g), 2 slices whole wheat bread (50g)",
-      macros: {
-        calories: 400,
-        protein: 26,
-        carbs: 30,
-        fat: 22,
-      },
-    },
-    {
-      name: "Oatmeal with Protein Powder",
-      portions: "1 cup dry oats (80g), 1 scoop protein powder (30g)",
-      macros: {
-        calories: 350,
-        protein: 24,
-        carbs: 42,
-        fat: 8,
-      },
-    },
-  ],
-  lunch: [
-    {
-      name: "Chicken and Rice",
-      portions: "6 oz chicken breast (170g), 1 cup cooked rice (185g)",
-      macros: {
-        calories: 450,
-        protein: 45,
-        carbs: 45,
-        fat: 8,
-      },
-    },
-    {
-      name: "Turkey Wrap",
-      portions: "6 oz turkey (170g), 1 large tortilla (60g)",
-      macros: {
-        calories: 400,
-        protein: 40,
-        carbs: 30,
-        fat: 12,
-      },
-    },
-  ],
-  dinner: [
-    {
-      name: "Beef and Rice",
-      portions: "6 oz lean beef (170g), 1 cup cooked rice (185g)",
-      macros: {
-        calories: 500,
-        protein: 42,
-        carbs: 45,
-        fat: 15,
-      },
-    },
-    {
-      name: "Chicken and Sweet Potato",
-      portions: "6 oz chicken breast (170g), 1 medium sweet potato (150g)",
-      macros: {
-        calories: 400,
-        protein: 42,
-        carbs: 35,
-        fat: 8,
-      },
-    },
-  ],
-};
+import { MealCategory, Meal, MealIndexes } from "@/app/types/meals";
+import { fetchMealData, generateRandomMealIndexes } from "@/app/utils/mealUtils";
 
 const MealData = () => {
-  const [mealIndexes, setMealIndexes] = useState({
+  const [mealData, setMealData] = useState<MealCategory | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mealIndexes, setMealIndexes] = useState<MealIndexes>({
     breakfast: 0,
     lunch: 0,
     dinner: 0,
   });
   const [refreshCount, setRefreshCount] = useState(0);
 
-  // Generate random meal indexes on initial load
+  // Fetch meal data from JSON file
   useEffect(() => {
-    const randomIndexes = {
-      breakfast: Math.floor(Math.random() * mealData.breakfast.length),
-      lunch: Math.floor(Math.random() * mealData.lunch.length),
-      dinner: Math.floor(Math.random() * mealData.dinner.length),
+    const getMealData = async () => {
+      try {
+        const data = await fetchMealData();
+        setMealData(data);
+        setIsLoading(false);
+      } catch {
+        setError("Failed to load meal data. Please try again later.");
+        setIsLoading(false);
+      }
     };
-    setMealIndexes(randomIndexes);
+
+    getMealData();
   }, []);
 
+  // Generate random meal indexes on initial load
+  useEffect(() => {
+    if (mealData) {
+      setMealIndexes(generateRandomMealIndexes(mealData));
+    }
+  }, [mealData]);
+
   const refreshMeals = () => {
+    if (!mealData) return;
+
     // Ensure all three meal types are refreshed at once
-    setMealIndexes({
-      breakfast: Math.floor(Math.random() * mealData.breakfast.length),
-      lunch: Math.floor(Math.random() * mealData.lunch.length),
-      dinner: Math.floor(Math.random() * mealData.dinner.length),
-    });
+    setMealIndexes(generateRandomMealIndexes(mealData));
     setRefreshCount((prevCount) => prevCount + 1);
   };
 
@@ -130,8 +58,24 @@ const MealData = () => {
     ? "Upgrade for More Refreshes"
     : "Refresh Meals";
 
+  if (isLoading) {
+    return (
+      <div className="container py-8 flex justify-center items-center">
+        <p>Loading meal data...</p>
+      </div>
+    );
+  }
+
+  if (error || !mealData) {
+    return (
+      <div className="container py-8 flex justify-center items-center">
+        <p className="text-red-500">{error || "Failed to load meal data"}</p>
+      </div>
+    );
+  }
+
   const renderMealCard = (category: string, meals: Meal[]) => {
-    const meal = meals[mealIndexes[category as keyof typeof mealIndexes]];
+    const meal = meals[mealIndexes[category as keyof MealIndexes]];
     return (
       <div key={category} className="space-y-4">
         <h2 className="text-3xl font-bold tracking-tight capitalize">

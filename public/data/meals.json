@@ -1,0 +1,158 @@
+{
+  "breakfast": [
+    {
+      "name": "Eggs and Toast",
+      "portions": "3 large eggs (150g), 2 slices whole wheat bread (50g)",
+      "macros": {
+        "calories": 400,
+        "protein": 26,
+        "carbs": 30,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Oatmeal with Protein Powder",
+      "portions": "1 cup dry oats (80g), 1 scoop protein powder (30g)",
+      "macros": {
+        "calories": 350,
+        "protein": 24,
+        "carbs": 42,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Greek Yogurt Bowl",
+      "portions": "1 cup Greek yogurt (200g), 1/2 cup berries (75g), 1 tbsp honey (20g)",
+      "macros": {
+        "calories": 320,
+        "protein": 22,
+        "carbs": 38,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Avocado Toast",
+      "portions": "2 slices whole grain bread (60g), 1/2 avocado (70g), 2 eggs (100g)",
+      "macros": {
+        "calories": 450,
+        "protein": 20,
+        "carbs": 35,
+        "fat": 28
+      }
+    },
+    {
+      "name": "Breakfast Smoothie",
+      "portions": "1 banana (100g), 1 scoop protein powder (30g), 1 cup milk (240ml), 1 tbsp peanut butter (15g)",
+      "macros": {
+        "calories": 380,
+        "protein": 25,
+        "carbs": 45,
+        "fat": 12
+      }
+    }
+  ],
+  "lunch": [
+    {
+      "name": "Chicken and Rice",
+      "portions": "6 oz chicken breast (170g), 1 cup cooked rice (185g)",
+      "macros": {
+        "calories": 450,
+        "protein": 45,
+        "carbs": 45,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Turkey Wrap",
+      "portions": "6 oz turkey (170g), 1 large tortilla (60g)",
+      "macros": {
+        "calories": 400,
+        "protein": 40,
+        "carbs": 30,
+        "fat": 12
+      }
+    },
+    {
+      "name": "Tuna Salad",
+      "portions": "1 can tuna (120g), 2 cups mixed greens (50g), 1 tbsp olive oil (15ml)",
+      "macros": {
+        "calories": 350,
+        "protein": 35,
+        "carbs": 10,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Quinoa Bowl",
+      "portions": "1 cup cooked quinoa (185g), 4 oz grilled chicken (115g), 1/2 avocado (70g)",
+      "macros": {
+        "calories": 480,
+        "protein": 30,
+        "carbs": 45,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Bean and Vegetable Soup",
+      "portions": "2 cups soup (480ml), 1 slice whole grain bread (30g)",
+      "macros": {
+        "calories": 380,
+        "protein": 18,
+        "carbs": 60,
+        "fat": 8
+      }
+    }
+  ],
+  "dinner": [
+    {
+      "name": "Beef and Rice",
+      "portions": "6 oz lean beef (170g), 1 cup cooked rice (185g)",
+      "macros": {
+        "calories": 500,
+        "protein": 42,
+        "carbs": 45,
+        "fat": 15
+      }
+    },
+    {
+      "name": "Chicken and Sweet Potato",
+      "portions": "6 oz chicken breast (170g), 1 medium sweet potato (150g)",
+      "macros": {
+        "calories": 400,
+        "protein": 42,
+        "carbs": 35,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Salmon with Roasted Vegetables",
+      "portions": "6 oz salmon fillet (170g), 2 cups mixed vegetables (200g)",
+      "macros": {
+        "calories": 480,
+        "protein": 40,
+        "carbs": 20,
+        "fat": 26
+      }
+    },
+    {
+      "name": "Vegetarian Stir Fry",
+      "portions": "1 cup tofu (250g), 2 cups mixed vegetables (200g), 1 tbsp oil (15ml)",
+      "macros": {
+        "calories": 420,
+        "protein": 25,
+        "carbs": 30,
+        "fat": 18
+      }
+    },
+    {
+      "name": "Turkey Meatballs with Pasta",
+      "portions": "5 oz turkey meatballs (140g), 1 cup cooked pasta (140g), 1/2 cup tomato sauce (125g)",
+      "macros": {
+        "calories": 520,
+        "protein": 35,
+        "carbs": 60,
+        "fat": 15
+      }
+    }
+  ]
+}
