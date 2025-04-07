@@ -1,7 +1,7 @@
-
-"use client"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
+"use client";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -37,7 +37,8 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            Makes dieting and reaching your goal physique easy. Customized Recipes for your caloric goals and needs.
+            Makes dieting and reaching your goal physique easy. Customized
+            Recipes for your caloric goals and needs.
           </motion.p>
           <motion.div
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
@@ -45,12 +46,16 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            <Button size="lg" className="w-full sm:w-auto">
-              Get started
-            </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
-              Learn more
-            </Button>
+            <Link href="/signup">
+              <Button size="lg" className="w-full sm:w-auto">
+                Get started
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                Learn more
+              </Button>
+            </Link>
           </motion.div>
         </motion.div>
       </div>
@@ -107,6 +112,5 @@ export default function Hero() {
         />
       </div>
     </div>
-  )
+  );
 }
-

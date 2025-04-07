@@ -3,19 +3,29 @@
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
 import { motion } from "framer-motion";
-import { useSignIn } from "@clerk/nextjs";
-import { useState } from "react";
+import { useSignIn, useAuth } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const { signIn, isLoaded } = useSignIn();
+  const { isSignedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [, setError] = useState("");
+  const router = useRouter();
+
+  // Redirect to Home if already signed in
+  useEffect(() => {
+    if (isSignedIn) {
+      router.push("/Home");
+    }
+  }, [isSignedIn, router]);
 
   // OAuth sign in handlers
   const handleOAuthSignIn = async (
     provider: "oauth_google" | "oauth_github"
   ) => {
-    if (!isLoaded) return;
+    if (!isLoaded || isSignedIn) return;
 
     try {
       setIsLoading(true);
@@ -30,6 +40,18 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  // If already signed in, show loading spinner while redirecting
+  if (isSignedIn) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-t-2 border-primary mx-auto"></div>
+          <p className="text-lg">Already signed in. Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">

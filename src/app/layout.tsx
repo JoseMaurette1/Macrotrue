@@ -22,7 +22,6 @@ export default function RootLayout({
         <ClerkProvider
           appearance={{
             elements: {
-              // Recommended to improve hydration issues
               rootBox: {
                 display: "flex",
                 justifyContent: "center",
@@ -32,12 +31,7 @@ export default function RootLayout({
             },
           }}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <ThemeProvider attribute="class" disableTransitionOnChange>
             {children}
           </ThemeProvider>
         </ClerkProvider>
