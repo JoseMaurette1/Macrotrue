@@ -134,7 +134,7 @@ const MealData = ({ onRefresh, refreshCount, maxRefreshes }: MealDataProps) => {
         <Button
           onClick={
             isRefreshDisabled
-              ? () => (window.location.href = "/pricing")
+              ? () => (window.location.href = "/Pricing")
               : handleRefresh
           }
           title={refreshButtonTitle}
