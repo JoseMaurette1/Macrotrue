@@ -1,69 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Github } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSignUp } from "@clerk/nextjs";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ClerkError } from "../types/clerk";
 
 export default function SignUpPage() {
-  const { signUp, isLoaded, setActive } = useSignUp();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { signUp, isLoaded } = useSignUp();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [, setError] = useState("");
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isLoaded) return;
-
-    try {
-      setIsLoading(true);
-      setError("");
-
-      const result = await signUp.create({
-        emailAddress: email,
-        password,
-      });
-
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.push("/Home");
-      } else {
-        // Handle other status cases
-        if (result.status === "missing_requirements") {
-          // Redirect to verification page if required
-          router.push("/verify");
-        } else {
-          console.error("Sign up failed", result);
-          setError("Something went wrong. Please try again.");
-        }
-      }
-    } catch (err: unknown) {
-      console.error("Error during sign up:", err);
-      const clerkError = err as ClerkError;
-      setError(
-        clerkError.errors?.[0]?.message ||
-          "Something went wrong. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // OAuth sign up handlers
   const handleOAuthSignUp = async (
     provider: "oauth_google" | "oauth_github"
   ) => {

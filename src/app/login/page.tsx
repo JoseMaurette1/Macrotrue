@@ -1,63 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Github } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSignIn } from "@clerk/nextjs";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ClerkError } from "../types/clerk";
 
 export default function LoginPage() {
-  const { signIn, isLoaded, setActive } = useSignIn();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { signIn, isLoaded } = useSignIn();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [, setError] = useState("");
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isLoaded) return;
-
-    try {
-      setIsLoading(true);
-      setError("");
-
-      const result = await signIn.create({
-        identifier: email,
-        password,
-      });
-
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.push("/Home");
-      } else {
-        console.error("Sign in failed", result);
-        setError("Something went wrong. Please try again.");
-      }
-    } catch (err: unknown) {
-      console.error("Error during sign in:", err);
-      const clerkError = err as ClerkError;
-      setError(
-        clerkError.errors?.[0]?.message ||
-          "Something went wrong. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // OAuth sign in handlers
   const handleOAuthSignIn = async (
     provider: "oauth_google" | "oauth_github"
   ) => {
