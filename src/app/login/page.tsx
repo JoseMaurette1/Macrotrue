@@ -215,64 +215,6 @@ export default function LoginPage() {
                 Github
               </Button>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="relative mb-8"
-            >
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or
-                </span>
-              </div>
-            </motion.div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Input
-                  id="email"
-                  placeholder="Email"
-                  type="email"
-                  value={email}
-                  onChange={handleEmailChange}
-                  required
-                  className="h-12"
-                />
-              </div>
-              <div className="space-y-2">
-                <Input
-                  id="password"
-                  placeholder="Password"
-                  type="password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  required
-                  className="h-12"
-                />
-              </div>
-
-              {error && <div className="text-sm text-red-500">{error}</div>}
-
-              <Button
-                type="submit"
-                className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isLoading || !isLoaded}
-              >
-                {isLoading ? "Loading..." : "Log In"}
-              </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
-                <a href="/signup" className="text-foreground hover:underline">
-                  Sign up
-                </a>
-              </p>
-            </form>
           </div>
         </div>
       </motion.div>

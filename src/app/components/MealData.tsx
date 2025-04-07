@@ -4,9 +4,18 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MealCategory, Meal, MealIndexes } from "@/app/types/meals";
-import { fetchMealData, generateRandomMealIndexes } from "@/app/utils/mealUtils";
+import {
+  fetchMealData,
+  generateRandomMealIndexes,
+} from "@/app/utils/mealUtils";
 
-const MealData = () => {
+interface MealDataProps {
+  onRefresh: () => void;
+  refreshCount: number;
+  maxRefreshes: number;
+}
+
+const MealData = ({ onRefresh, refreshCount, maxRefreshes }: MealDataProps) => {
   const [mealData, setMealData] = useState<MealCategory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +24,6 @@ const MealData = () => {
     lunch: 0,
     dinner: 0,
   });
-  const [refreshCount, setRefreshCount] = useState(0);
 
   // Fetch meal data from JSON file
   useEffect(() => {
@@ -40,23 +48,17 @@ const MealData = () => {
     }
   }, [mealData]);
 
-  const refreshMeals = () => {
+  const handleRefresh = () => {
     if (!mealData) return;
-
-    // Ensure all three meal types are refreshed at once
     setMealIndexes(generateRandomMealIndexes(mealData));
-    setRefreshCount((prevCount) => prevCount + 1);
+    onRefresh();
   };
 
-  const isRefreshDisabled = refreshCount >= 1;
+  const isRefreshDisabled = refreshCount >= maxRefreshes;
 
   const refreshButtonTitle = isRefreshDisabled
-    ? "Upgrade to premium or pro to refresh more than once"
-    : "";
-
-  const refreshButtonText = isRefreshDisabled
-    ? "Upgrade for More Refreshes"
-    : "Refresh Meals";
+    ? "Upgrade to premium or pro to refresh more than 5 times"
+    : `${maxRefreshes - refreshCount} refreshes remaining`;
 
   if (isLoading) {
     return (
@@ -123,15 +125,41 @@ const MealData = () => {
       {Object.entries(mealData).map(([category, meals]) =>
         renderMealCard(category, meals as Meal[])
       )}
-      <div className="flex justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex justify-center"
+      >
         <Button
-          onClick={refreshMeals}
-          disabled={isRefreshDisabled}
+          onClick={
+            isRefreshDisabled
+              ? () => (window.location.href = "/pricing")
+              : handleRefresh
+          }
           title={refreshButtonTitle}
+          className={`${
+            isRefreshDisabled ? "bg-gray-500" : "bg-primary"
+          } text-white`}
+          aria-label={
+            isRefreshDisabled ? "Upgrade for More Refreshes" : "Refresh Meals"
+          }
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (isRefreshDisabled) {
+                window.location.href = "/pricing";
+              } else {
+                handleRefresh();
+              }
+            }
+          }}
         >
-          {refreshButtonText}
+          {isRefreshDisabled
+            ? "Upgrade for More Refreshes"
+            : `Refresh Meals (${maxRefreshes - refreshCount} left)`}
         </Button>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

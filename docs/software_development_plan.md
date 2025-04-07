@@ -16,36 +16,54 @@ This document outlines the development plan for Macrotrue, a SaaS application th
    - [x] Git repository initialization
 
 2. **Authentication & Landing Page**
+
    - [x] Clerk authentication implementation
    - [x] Login/signup flows
    - [x] Protected routes
    - [x] Responsive landing page
    - [x] Basic navigation
 
+3. **Core Features**
+   - [x] Implement reset button logic
+   - [x] Add meal refresh functionality
+   - [ ] Create meal rotation system
+   - [ ] Implement refresh limits
+   - [x] Add upgrade prompts
+
 ### In Progress Features 🚧
 
-1. **Meal System Implementation**
+1. **Database Migration**
 
-   - [ ] Expand JSON meal database
-   - [ ] Implement meal rendering logic
-   - [ ] Add meal refresh functionality
-   - [ ] Create meal rotation system
-   - [ ] Add nutritional information display
+   - [ ] Set up Supabase project
+   - [ ] Design database schema
+   - [ ] Migrate existing data
+   - [ ] Update API endpoints
+   - [ ] Implement real-time features
 
-2. **Core Features**
-   - [ ] Implement reset button logic
-   - [ ] Add meal preference settings
-   - [ ] Create meal combination algorithm
-   - [ ] Implement portion size handling
+2. **Payment Integration**
+
+   - [ ] Set up Stripe account
+   - [ ] Configure subscription tiers
+   - [ ] Implement payment flow
+   - [ ] Handle webhooks
+   - [ ] Test payment system
+
+3. **Workout App Integration**
+
+   - [ ] Identify core components for migration
+   - [ ] Analyze dependencies and conflicts
+   - [ ] Create module structure
+   - [ ] Migrate and adapt components
+   - [ ] Integrate with existing auth system
 
 ### Upcoming Features 📋
 
-1. **Subscription System**
+1. **Enhanced Meal System**
 
-   - [ ] Define tier limitations
-   - [ ] Set up Stripe integration
-   - [ ] Implement subscription management
-   - [ ] Add premium features
+   - [ ] Expand meal database
+   - [ ] Add meal preferences
+   - [ ] Implement portion customization
+   - [ ] Add nutritional goals
 
 2. **Testing & Optimization**
    - [ ] Performance testing
@@ -55,35 +73,72 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 
 ## Immediate Priority Tasks
 
-### 1. Meal Database Enhancement
+### 1. Supabase Integration
 
-1. **JSON Database Expansion**
+1. **Initial Setup**
 
-   - Add more meal options
-   - Include detailed nutritional information
-   - Add meal categories and tags
-   - Define portion sizes
+   - Create Supabase project
+   - Configure authentication
+   - Set up database tables
+   - Define access policies
 
-2. **Meal Display System**
-   - Create meal card components
-   - Implement grid/list view
-   - Add meal details modal
-   - Include nutritional information display
+2. **Data Migration**
 
-### 2. Reset Button Implementation
+   - Design user table schema
+   - Create meals table
+   - Set up subscription table
+   - Migrate existing data
+   - Update API endpoints
 
-1. **Functionality**
+### 2. Stripe Implementation
 
-   - Implement meal refresh logic
-   - Add randomization algorithm
-   - Ensure no immediate meal repetition
-   - Handle edge cases
+1. **Payment Infrastructure**
+
+   - Set up Stripe account
+   - Configure webhook endpoints
+   - Create subscription products
+   - Set up test environment
 
 2. **User Interface**
-   - Add reset button component
-   - Implement loading states
-   - Add success/error notifications
-   - Include animation effects
+
+   - Design pricing page
+   - Create checkout flow
+   - Implement subscription management
+   - Add payment status indicators
+
+### 3. Workout App Integration
+
+1. **Analysis and Planning**
+
+   - Identify the 3-4 key components to migrate
+   - Document component dependencies
+   - Create integration architecture diagram
+   - Identify shared data requirements
+   - Map authentication flows
+
+2. **Component Migration**
+
+   - Create workout module directory structure
+   - Copy and adapt core components
+   - Update import paths and references
+   - Refactor any incompatible code
+   - Adapt styles to match existing design system
+
+3. **Integration**
+
+   - Create navigation links to workout section
+   - Implement state sharing mechanism
+   - Connect to authentication context
+   - Add data persistence where needed
+   - Ensure responsive design
+
+4. **Testing**
+
+   - Test components in isolation
+   - Verify integrated functionality
+   - Test on different devices
+   - Create automated tests
+   - Fix any styling inconsistencies
 
 ## Tech Stack
 
@@ -92,6 +147,8 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 - TypeScript
 - Authentication: Clerk
 - UI: Shadcn UI
+- Database: Supabase
+- Payments: Stripe
 - Icons: lucide-react
 
 ## Development Phases
@@ -206,6 +263,29 @@ This document outlines the development plan for Macrotrue, a SaaS application th
    - Implement monitoring
    - Add analytics tracking
 
+### Phase 6: Workout App Integration (1-2 weeks)
+
+1. **Component Migration**
+
+   - Identify core workout components
+   - Create modular architecture
+   - Implement adapter patterns for state management
+   - Ensure styling consistency
+
+2. **Feature Integration**
+
+   - Connect workout data with user profiles
+   - Implement workout tracking
+   - Add progress visualization
+   - Create workout recommendation system
+
+3. **Cross-Module Functionality**
+
+   - Connect nutrition and workout data
+   - Create holistic fitness dashboard
+   - Implement shared progress tracking
+   - Add combined reporting features
+
 ## Additional Considerations
 
 ### Security
@@ -234,6 +314,13 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 - **Total Development Time**: 10-15 weeks
 - **Testing and Refinement Buffer**: 2-3 weeks
 - **Total Project Timeline**: 12-18 weeks
+
+## Timeline Update
+
+- **Database Migration**: 1-2 weeks
+- **Payment Integration**: 1-2 weeks
+- **Workout App Integration**: 1-2 weeks
+- **Testing & Refinement**: 1 week
 
 ## Success Metrics
 
@@ -273,7 +360,53 @@ This plan should be reviewed weekly to track progress and adjust priorities as n
 ### Weekly Review Checklist
 
 - [ ] Review completed features
-- [ ] Update progress tracking
-- [ ] Identify blockers
-- [ ] Adjust timelines if needed
+- [ ] Test payment integration
+- [ ] Monitor database performance
+- [ ] Address security concerns
 - [ ] Plan next week's priorities
+
+### Next Steps
+
+1. Set up Supabase project and configure initial settings
+2. Create database schema and migration plan
+3. Set up Stripe account and test environment
+4. Begin workout app component analysis
+5. Implement basic payment flow
+6. Add subscription management features
+
+## Best Practices for Workout App Integration
+
+### Modular Architecture
+
+- Create a self-contained workout module
+- Minimize dependencies on parent application
+- Use clear interfaces for data exchange
+- Maintain separation of concerns
+
+### State Management
+
+- Use context providers for shared state
+- Implement adapter pattern for different state approaches
+- Keep workout state isolated when possible
+- Define clear data flow patterns
+
+### Styling Approach
+
+- Adapt component styling to match Macrotrue design system
+- Use CSS modules or styled components for encapsulation
+- Maintain consistent user experience
+- Ensure responsive design across devices
+
+### Code Reusability
+
+- Extract reusable utilities and hooks
+- Create shared component library
+- Document component APIs clearly
+- Implement consistent prop interfaces
+
+### Testing Strategy
+
+- Test components in isolation
+- Create integration tests for workflows
+- Test with different user roles
+- Verify mobile responsiveness

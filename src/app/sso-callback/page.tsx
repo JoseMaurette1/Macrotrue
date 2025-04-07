@@ -6,11 +6,7 @@ import { motion } from "framer-motion";
 export default function SSOCallback() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <AuthenticateWithRedirectCallback
-        redirectUrl="/Home"
-        afterSignInUrl="/Home"
-        afterSignUpUrl="/Home"
-      />
+      <AuthenticateWithRedirectCallback />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

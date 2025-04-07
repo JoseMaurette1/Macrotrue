@@ -4,28 +4,27 @@ import React, { useEffect, useState } from "react";
 import MealData from "../components/MealData";
 import MemberHeader from "../components/MemberHeader";
 
+const MAX_REFRESHES = 5;
+
 const FoodPage = () => {
   const [calories, setCalories] = useState<number | null>(null);
-  const [refreshCount, setRefreshCount] = useState<number>(() => {
-    const savedCount = localStorage.getItem("refreshCount");
-    return savedCount ? parseInt(savedCount) : 0;
-  });
+  const [refreshCount, setRefreshCount] = useState<number>(0);
 
   useEffect(() => {
+    const savedCount = localStorage.getItem("refreshCount");
     const savedCalories = localStorage.getItem("selectedCalories");
+
+    setRefreshCount(savedCount ? parseInt(savedCount) : 0);
     setCalories(savedCalories ? parseInt(savedCalories) : null);
   }, []);
 
   const handleRefresh = () => {
-    if (refreshCount < 5) {
-      // Logic to refresh meal data
+    if (refreshCount < MAX_REFRESHES) {
       setRefreshCount((prevCount) => {
         const newCount = prevCount + 1;
         localStorage.setItem("refreshCount", newCount.toString());
         return newCount;
       });
-    } else {
-      alert("You have reached the maximum number of refreshes.");
     }
   };
 
@@ -43,10 +42,11 @@ const FoodPage = () => {
             </div>
           </div>
         )}
-        <MealData />
-        <button onClick={handleRefresh} disabled={refreshCount >= 5} className="btn btn-primary">
-          Refresh Meals
-        </button>
+        <MealData
+          onRefresh={handleRefresh}
+          refreshCount={refreshCount}
+          maxRefreshes={MAX_REFRESHES}
+        />
       </div>
     </>
   );

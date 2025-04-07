@@ -44,7 +44,10 @@ export default function VerifyPage() {
     } catch (err: unknown) {
       console.error("Error during verification:", err);
       const clerkError = err as ClerkError;
-      setError(clerkError.errors?.[0]?.message || "Something went wrong. Please try again.");
+      setError(
+        clerkError.errors?.[0]?.message ||
+          "Something went wrong. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -64,7 +67,10 @@ export default function VerifyPage() {
     } catch (err: unknown) {
       console.error("Error resending code:", err);
       const clerkError = err as ClerkError;
-      setError(clerkError.errors?.[0]?.message || "Failed to resend code. Please try again.");
+      setError(
+        clerkError.errors?.[0]?.message ||
+          "Failed to resend code. Please try again."
+      );
     }
   };
 
@@ -81,7 +87,8 @@ export default function VerifyPage() {
             Verify your email
           </h2>
           <p className="mb-8 text-gray-400">
-            We&apos;ve sent a verification code to your email address. Please enter it below.
+            We&apos;ve sent a verification code to your email address. Please
+            enter it below.
           </p>
 
           {error && (
@@ -130,7 +137,10 @@ export default function VerifyPage() {
 
             <p className="text-center text-sm text-muted-foreground">
               Need help?{" "}
-              <a href="mailto:support@macrotrue.com" className="text-foreground hover:underline">
+              <a
+                href="mailto:support@macrotrue.com"
+                className="text-foreground hover:underline"
+              >
                 Contact support
               </a>
             </p>
