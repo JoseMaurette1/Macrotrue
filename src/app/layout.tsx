@@ -31,7 +31,7 @@ export default function RootLayout({
             },
           }}
         >
-          <ThemeProvider attribute="class" disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
             {children}
           </ThemeProvider>
         </ClerkProvider>
