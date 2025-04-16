@@ -1,7 +1,12 @@
 import React from "react";
+import WorkoutForm from "../components/WorkoutForm";
 
 const page = () => {
-  return <div>page</div>;
+  return (
+    <div>
+      <WorkoutForm />
+    </div>
+  );
 };
 
 export default page;
