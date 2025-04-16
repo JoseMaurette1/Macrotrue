@@ -6,6 +6,7 @@ import SaveWorkoutButton from "@/app/components/SaveWorkoutButton";
 import { upperWorkoutTemplate } from "@/app/components/Upper";
 import { lowerWorkoutTemplate } from "@/app/components/Lower";
 import { OtherWorkoutTemplate } from "@/app/components/Other";
+import MemberHeader from "@/app/components/MemberHeader";
 
 type WorkoutType = "upper" | "lower" | "other";
 
@@ -93,31 +94,34 @@ export default function WorkoutForm() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <WorkoutTypeButtons
-        workoutType={workoutType}
-        setWorkoutType={setWorkoutType}
-      />
+    <>
+      <MemberHeader />
+      <div className="container mx-auto px-4 py-8 mt-6">
+        <WorkoutTypeButtons
+          workoutType={workoutType}
+          setWorkoutType={setWorkoutType}
+        />
 
-      {workoutType && (
-        <WorkoutCard
-          workoutType={workoutType}
-          upperWorkout={upperWorkout}
-          lowerWorkout={lowerWorkout}
-          otherWorkout={otherWorkout}
-          setUpperWorkout={setUpperWorkout}
-          setLowerWorkout={setLowerWorkout}
-          setOtherWorkout={setOtherWorkout}
-        />
-      )}
-      {workoutType && (
-        <SaveWorkoutButton
-          workoutType={workoutType}
-          upperWorkout={upperWorkout}
-          lowerWorkout={lowerWorkout}
-          otherWorkout={otherWorkout}
-        />
-      )}
-    </div>
+        {workoutType && (
+          <WorkoutCard
+            workoutType={workoutType}
+            upperWorkout={upperWorkout}
+            lowerWorkout={lowerWorkout}
+            otherWorkout={otherWorkout}
+            setUpperWorkout={setUpperWorkout}
+            setLowerWorkout={setLowerWorkout}
+            setOtherWorkout={setOtherWorkout}
+          />
+        )}
+        {workoutType && (
+          <SaveWorkoutButton
+            workoutType={workoutType}
+            upperWorkout={upperWorkout}
+            lowerWorkout={lowerWorkout}
+            otherWorkout={otherWorkout}
+          />
+        )}
+      </div>
+    </>
   );
 }
