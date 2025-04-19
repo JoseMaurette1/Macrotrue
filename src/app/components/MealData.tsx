@@ -6,34 +6,106 @@ import { motion } from "framer-motion";
 import { MealCategory, Meal, MealIndexes } from "@/app/types/meals";
 import {
   fetchMealData,
+  fetchMealDataFromJson,
   generateRandomMealIndexes,
+  calculateAdjustedMeal,
 } from "@/app/utils/mealUtils";
 
 interface MealDataProps {
   onRefresh: () => void;
   refreshCount: number;
   maxRefreshes: number;
+  targetCalories?: number | null;
 }
 
-const MealData = ({ onRefresh, refreshCount, maxRefreshes }: MealDataProps) => {
+const MealData = ({
+  onRefresh,
+  refreshCount,
+  maxRefreshes,
+  targetCalories,
+}: MealDataProps) => {
   const [mealData, setMealData] = useState<MealCategory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataSource, setDataSource] = useState<"supabase" | "json" | "none">(
+    "none"
+  );
   const [mealIndexes, setMealIndexes] = useState<MealIndexes>({
     breakfast: 0,
     lunch: 0,
     dinner: 0,
   });
 
-  // Fetch meal data from JSON file
+  // Fetch meal data
   useEffect(() => {
     const getMealData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      // Always load JSON data first as a safety measure
+      let jsonData: MealCategory | null = null;
+
       try {
-        const data = await fetchMealData();
-        setMealData(data);
-        setIsLoading(false);
-      } catch {
-        setError("Failed to load meal data. Please try again later.");
+        jsonData = await fetchMealDataFromJson();
+        console.log("Successfully loaded JSON fallback data");
+      } catch (jsonError) {
+        console.error("Failed to load JSON fallback data:", jsonError);
+      }
+
+      // If we don't have valid JSON data as a fallback, create an empty structure
+      if (!jsonData || !Object.values(jsonData).some((arr) => arr.length > 0)) {
+        jsonData = {
+          breakfast: [],
+          lunch: [],
+          dinner: [],
+        };
+      }
+
+      // Now try Supabase with a simple timeout to avoid hanging
+      try {
+        // Wrap the actual fetch in another try-catch to handle empty error objects
+        let supabaseData: MealCategory | null = null;
+
+        try {
+          supabaseData = await Promise.race([
+            fetchMealData(),
+            new Promise<MealCategory>((_, reject) => {
+              setTimeout(
+                () => reject(new Error("Supabase connection timeout")),
+                5000
+              );
+            }),
+          ]);
+        } catch (innerError) {
+          console.error("Inner error fetching data from Supabase:", innerError);
+          // Force continue to JSON fallback
+          throw new Error(
+            "Forcing fallback to JSON due to Supabase fetch error"
+          );
+        }
+
+        // Only use the data if it has content
+        if (
+          supabaseData &&
+          Object.values(supabaseData).some((arr) => arr.length > 0)
+        ) {
+          console.log("Successfully loaded data from Supabase");
+          setMealData(supabaseData);
+          setDataSource("supabase");
+          setIsLoading(false);
+        } else {
+          console.warn("Supabase returned empty data, using JSON fallback");
+          setMealData(jsonData);
+          setDataSource("json");
+          setIsLoading(false);
+        }
+      } catch (supabaseError) {
+        console.error("Failed to fetch from Supabase:", supabaseError);
+
+        // Always show JSON data if we have it, even on error
+        console.log("Using JSON fallback data after Supabase error");
+        setMealData(jsonData);
+        setDataSource("json");
         setIsLoading(false);
       }
     };
@@ -70,18 +142,72 @@ const MealData = ({ onRefresh, refreshCount, maxRefreshes }: MealDataProps) => {
 
   if (error || !mealData) {
     return (
-      <div className="container py-8 flex justify-center items-center">
+      <div className="container py-8 flex flex-col justify-center items-center space-y-4">
         <p className="text-red-500">{error || "Failed to load meal data"}</p>
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-primary text-white"
+        >
+          Refresh Page
+        </Button>
       </div>
     );
   }
 
+  // Check if we have any data to display
+  const hasAnyMeals = Object.values(mealData).some(
+    (category) => category.length > 0
+  );
+
+  if (!hasAnyMeals) {
+    return (
+      <div className="container py-8 flex flex-col justify-center items-center space-y-4">
+        <p className="text-amber-500">
+          No meal data available. Please check back later.
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-primary text-white"
+        >
+          Refresh Page
+        </Button>
+      </div>
+    );
+  }
+
+  // Calculate calories per meal if target calories are provided
+  const getCaloriesPerMeal = () => {
+    if (!targetCalories) return null;
+
+    // Divide the total calories evenly across three meals
+    return Math.round(targetCalories / 3);
+  };
+
+  const caloriesPerMeal = getCaloriesPerMeal();
+
   const renderMealCard = (category: string, meals: Meal[]) => {
-    const meal = meals[mealIndexes[category as keyof MealIndexes]];
+    // Skip rendering if no meals for this category
+    if (meals.length === 0) return null;
+
+    const mealIndex = mealIndexes[category as keyof MealIndexes];
+    // Handle potential index out of bounds
+    const safeIndex = meals.length > 0 ? mealIndex % meals.length : 0;
+    let meal = meals[safeIndex];
+
+    // If target calories are set, adjust the meal portions and macros
+    if (caloriesPerMeal && meal) {
+      meal = calculateAdjustedMeal(meal, caloriesPerMeal);
+    }
+
     return (
       <div key={category} className="space-y-4">
         <h2 className="text-3xl font-bold tracking-tight capitalize">
           {category}
+          {caloriesPerMeal && (
+            <span className="text-sm ml-2 font-normal text-muted-foreground">
+              Target: {caloriesPerMeal} cal
+            </span>
+          )}
         </h2>
         <div className="grid gap-6">
           <Card className="border-border">
@@ -122,9 +248,16 @@ const MealData = ({ onRefresh, refreshCount, maxRefreshes }: MealDataProps) => {
       transition={{ duration: 0.5 }}
       className="container py-8 space-y-8"
     >
+      {dataSource === "json" && (
+        <div className="text-amber-500 text-sm text-center mb-2">
+          Using fallback meal data. Some features may be limited.
+        </div>
+      )}
+
       {Object.entries(mealData).map(([category, meals]) =>
         renderMealCard(category, meals as Meal[])
       )}
+
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

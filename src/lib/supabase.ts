@@ -30,56 +30,65 @@ const FALLBACK_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oZG9nYmN6eW5kZHRvZ2RqYmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxMzQ2NjUsImV4cCI6MjA1OTcxMDY2NX0.wAEecwxkoITczVw5_rdaZwCjjP8RDirxkBzrXyk6W-s";
 
 // Get environment variables with fallbacks
-const supabaseUrl = getEnvVar("NEXT_PUBLIC_SUPABASE_URL", FALLBACK_URL);
+const rawSupabaseUrl = getEnvVar("NEXT_PUBLIC_SUPABASE_URL", FALLBACK_URL);
 const supabaseAnonKey = getEnvVar(
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   FALLBACK_KEY
 );
 
-let supabase: ReturnType<typeof createClient> | null = null;
+// Validate and format the Supabase URL
+let supabaseUrl = rawSupabaseUrl;
+if (!supabaseUrl.startsWith("https://") && !supabaseUrl.startsWith("http://")) {
+  supabaseUrl = `https://${supabaseUrl}`;
+}
+
+// Validation flags
+export const hasValidSupabaseUrl =
+  supabaseUrl &&
+  (supabaseUrl.includes(".supabase.co") || supabaseUrl.includes("localhost"));
+
+export const hasValidSupabaseKey =
+  supabaseAnonKey && supabaseAnonKey.length > 20;
+
+export const hasValidSupabaseConfig =
+  hasValidSupabaseUrl && hasValidSupabaseKey;
+
+// Export configuration for logging
+export const supabaseConfig = {
+  url: hasValidSupabaseUrl ? supabaseUrl : null,
+  hasKey: hasValidSupabaseKey,
+  isConfigValid: hasValidSupabaseConfig,
+};
+
+// Create Supabase client conditionally
+let supabaseClient = null;
 
 try {
-  // Create the Supabase client (will throw if URL or key are invalid)
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true, // Enable session persistence
-      autoRefreshToken: true, // Auto-refresh tokens
-      detectSessionInUrl: true, // Detect session from URL
-    },
-  });
-
-  // Test if client is working by making a simple query
-  if (typeof window !== "undefined") {
-    // Only run this client-side check in the browser
-    supabase
-      .from("workouts")
-      .select("count", { count: "exact", head: true })
-      .then(() => {
-        console.log("Supabase client initialized successfully");
-      }, (err) => {
-        // This handles errors because .catch() is not available on PromiseLike<void>
-        console.warn("Warning: Supabase connection test failed", err);
-      });
+  if (hasValidSupabaseConfig) {
+    console.log(
+      "Initializing Supabase client with URL:",
+      supabaseUrl.substring(0, 30) + "..."
+    );
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  } else {
+    // Try with fallback values as a last resort
+    console.warn("Invalid Supabase configuration, trying with fallback values");
+    supabaseClient = createClient(FALLBACK_URL, FALLBACK_KEY);
   }
 } catch (error) {
-  // Handle client initialization errors
-  console.error("Error initializing Supabase client:", error);
-
-  if (typeof window !== "undefined") {
-    // Redirect to fallback page if in browser
-    if (window.location.pathname !== "/fallback.html") {
-      console.warn(
-        "Redirecting to fallback page due to Supabase initialization error"
-      );
-      // Don't redirect during development to avoid infinite loops
-      if (process.env.NODE_ENV !== "development") {
-        window.location.href = "/fallback.html";
-      }
-    }
+  console.error("Failed to initialize Supabase client:", error);
+  // One last attempt with fallbacks
+  try {
+    supabaseClient = createClient(FALLBACK_URL, FALLBACK_KEY);
+  } catch (finalError) {
+    console.error(
+      "Final attempt to create Supabase client failed:",
+      finalError
+    );
   }
 }
 
-export { supabase };
+export const supabase = supabaseClient;
 
 // Database types
 export type Json =
