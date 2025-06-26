@@ -65,7 +65,7 @@ export default function Footer() {
               <span className="sr-only">Instagram</span>
               <Instagram className="h-6 w-6" />
             </Link>
-            <Link href="https://linkedin.com/in/josemaurette" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="https://linkedin.com/in/maurette" className="text-muted-foreground hover:text-foreground transition-colors">
               <span className="sr-only">LinkedIn</span>
               <Linkedin className="h-6 w-6" />
             </Link>
