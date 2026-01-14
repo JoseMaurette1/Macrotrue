@@ -63,7 +63,7 @@ export default function Hero() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-primary/10 dark:bg-primary/20 rounded-full"
+          className="absolute -top-1/2 -left-1/2 w-full h-full bg-muted rounded-full opacity-50"
           animate={{
             scale: [1, 1.05, 1],
             rotate: [0, 180, 0],
@@ -75,7 +75,7 @@ export default function Hero() {
           }}
         />
         <motion.div
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-secondary/10 dark:bg-secondary/20 rounded-full"
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-muted rounded-full opacity-40"
           animate={{
             scale: [1, 1.05, 1],
             rotate: [0, -180, 0],
@@ -87,7 +87,7 @@ export default function Hero() {
           }}
         />
         <motion.div
-          className="absolute top-1/4 left-1/4 w-12 h-12 bg-primary/20 dark:bg-primary/30 rounded-full"
+          className="absolute top-1/4 left-1/4 w-12 h-12 bg-primary rounded-full opacity-20"
           animate={{
             y: [0, -10, 0],
             x: [0, 10, 0],
@@ -99,7 +99,7 @@ export default function Hero() {
           }}
         />
         <motion.div
-          className="absolute bottom-1/4 right-1/4 w-8 h-8 bg-secondary/20 dark:bg-secondary/30 rounded-full"
+          className="absolute bottom-1/4 right-1/4 w-8 h-8 bg-primary rounded-full opacity-15"
           animate={{
             y: [0, 15, 0],
             x: [0, -15, 0],

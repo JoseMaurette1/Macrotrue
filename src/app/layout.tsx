@@ -32,7 +32,7 @@ export default function RootLayout({
             },
           }}
         >
-          <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
             {children}
           </ThemeProvider>
           <Toaster closeButton expand={false} richColors />

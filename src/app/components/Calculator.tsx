@@ -26,15 +26,26 @@ export default function CalorieCalculator() {
   const [weight, setWeight] = useState("");
   const [activityLevel, setActivityLevel] = useState("sedentary");
   const [selectedCalories, setSelectedCalories] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("selectedCalories");
-    if (saved) {
-      setSelectedCalories(parseInt(saved));
-    }
+    const fetchGoal = async () => {
+      try {
+        const response = await fetch("/api/goals");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.calorieGoal) {
+            setSelectedCalories(data.calorieGoal);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching goal:", error);
+      }
+    };
+    fetchGoal();
   }, []);
 
-  const calculateBMR = (system: "metric" | "us") => {
+  const calculateBMR = (system: "us" | "metric") => {
     if (
       !weight ||
       (!height && system === "metric") ||
@@ -89,9 +100,20 @@ export default function CalorieCalculator() {
     return Math.round(tdee + adjustment - 200); // Subtracting 200 to adjust the calorie calculations
   };
 
-  const handleCardClick = (calories: number) => {
+  const handleCardClick = async (calories: number) => {
     setSelectedCalories(calories);
-    localStorage.setItem("selectedCalories", calories.toString());
+    setIsSaving(true);
+    try {
+      await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ calorieGoal: calories }),
+      });
+    } catch (error) {
+      console.error("Error saving goal:", error);
+    } finally {
+      setIsSaving(false);
+    }
     router.push('/Food');
   };
 
@@ -132,7 +154,7 @@ export default function CalorieCalculator() {
             </RadioGroup>
           </div>
 
-          <Tabs defaultValue="metric" className="w-full">
+          <Tabs defaultValue="us" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="us">US</TabsTrigger>
               <TabsTrigger value="metric">Metric</TabsTrigger>
@@ -231,7 +253,7 @@ export default function CalorieCalculator() {
                 const system = height ? "metric" : "us";
                 const tdee = calculateTDEE(system);
                 return (
-                  <div className="grid grid-cols-2 gap-4 ">
+                    <div className={`grid grid-cols-2 gap-4 ${isSaving ? "pointer-events-none opacity-50" : ""}`}>
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}

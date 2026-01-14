@@ -8,10 +8,11 @@ import {
   getWorkoutHistory,
   clearWorkoutHistory,
   WorkoutEntry,
-  WorkoutType,
 } from "@/lib/api";
 
 import { toast } from "sonner";
+
+type WorkoutType = "upper" | "lower";
 
 export default function WorkoutHistory() {
   const [upperWorkoutHistory, setUpperWorkoutHistory] = useState<
@@ -20,24 +21,19 @@ export default function WorkoutHistory() {
   const [lowerWorkoutHistory, setLowerWorkoutHistory] = useState<
     WorkoutEntry[]
   >([]);
-  const [otherWorkoutHistory, setOtherWorkoutHistory] = useState<
-    WorkoutEntry[]
-  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isClearing, setIsClearing] = useState<WorkoutType | null>(null);
 
   const loadWorkoutHistory = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [upper, lower, other] = await Promise.all([
+      const [upper, lower] = await Promise.all([
         getWorkoutHistory("upper"),
         getWorkoutHistory("lower"),
-        getWorkoutHistory("other"),
       ]);
 
       setUpperWorkoutHistory(upper);
       setLowerWorkoutHistory(lower);
-      setOtherWorkoutHistory(other);
     } catch (error) {
       console.error("Error loading workout history:", error);
       toast.error("Failed to load workout history");
@@ -60,13 +56,10 @@ export default function WorkoutHistory() {
         setUpperWorkoutHistory([]);
       } else if (type === "lower") {
         setLowerWorkoutHistory([]);
-      } else if (type === "other") {
-        setOtherWorkoutHistory([]);
       }
 
       toast.success(
-        `${type.charAt(0).toUpperCase() + type.slice(1)
-        } workout history cleared`
+        `${type.charAt(0).toUpperCase() + type.slice(1)} workout history cleared`
       );
     } catch (error) {
       console.error("Error clearing history:", error);
@@ -136,7 +129,6 @@ export default function WorkoutHistory() {
       </h1>
       {renderWorkout(upperWorkoutHistory, "Upper Workout History", "upper")}
       {renderWorkout(lowerWorkoutHistory, "Lower Workout History", "lower")}
-      {renderWorkout(otherWorkoutHistory, "Other Workout History", "other")}
     </div>
   );
 }

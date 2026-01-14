@@ -6,20 +6,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home, Calculator, LogOut, Utensils, Dumbbell } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function MemberHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { signOut } = useClerk();
-  const router = useRouter();
   const pathname = usePathname();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleSignOut = async () => {
+    // Use window.location for a full page redirect to avoid any client-side flash
     await signOut();
-    router.push("/");
+    window.location.href = "/";
   };
 
   useEffect(() => {

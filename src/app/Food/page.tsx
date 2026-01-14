@@ -11,28 +11,42 @@ const FoodPage = () => {
   const [calories, setCalories] = useState<number | null>(null);
   const [targetCalories, setTargetCalories] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedCount = localStorage.getItem("refreshCount");
-    const savedCalories = localStorage.getItem("selectedCalories");
-    const savedTargetCalories = localStorage.getItem("targetCalories");
+    const fetchGoal = async () => {
+      try {
+        const response = await fetch("/api/goals");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.calorieGoal) {
+            setCalories(data.calorieGoal);
+            setTargetCalories(data.calorieGoal);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch calorie goal:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setRefreshCount(savedCount ? parseInt(savedCount) : 0);
-    setCalories(savedCalories ? parseInt(savedCalories) : null);
-    setTargetCalories(
-      savedTargetCalories ? parseInt(savedTargetCalories) : null
-    );
+    fetchGoal();
   }, []);
 
   const handleRefresh = () => {
     if (refreshCount < MAX_REFRESHES) {
-      setRefreshCount((prevCount) => {
-        const newCount = prevCount + 1;
-        localStorage.setItem("refreshCount", newCount.toString());
-        return newCount;
-      });
+      setRefreshCount((prevCount) => prevCount + 1);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <MemberHeader />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -46,18 +60,20 @@ const FoodPage = () => {
             <div className="p-4 bg-primary/10 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
               <span className="text-xl font-semibold">{calories} Calories</span>
             </div>
-
-            {targetCalories && targetCalories !== calories && (
-              <Card className="mt-3 bg-green-50 dark:bg-green-900/20">
-                <CardContent className="pt-4">
-                  <p className="text-sm">
-                    Your portions will be adjusted to meet your target of{" "}
-                    <strong>{targetCalories} calories</strong> per day.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
           </div>
+        )}
+        {!calories && (
+          <Card className="mb-6">
+            <CardContent className="pt-4">
+              <p className="text-amber-500">
+                Please set your calorie goal in the{" "}
+                <a href="/Calculator" className="underline">
+                  Calculator
+                </a>{" "}
+                first.
+              </p>
+            </CardContent>
+          </Card>
         )}
         <MealData
           onRefresh={handleRefresh}

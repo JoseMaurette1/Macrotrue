@@ -23,7 +23,6 @@ export default function Header() {
   const menuItems = [
     { href: "#features", label: "Features" },
     { href: "#pricing", label: "Pricing" },
-    { href: "#testimonials", label: "Testimonials" },
   ]
 
   return (

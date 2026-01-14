@@ -62,8 +62,8 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="relative hidden w-1/2 p-8 lg:block"
       >
-        <div className="h-full w-full overflow-hidden rounded-[40px] bg-gradient-to-b from-[#2563eb] via-[#2563eb] to-[#2563eb]">
-          <div className="flex h-full flex-col items-center justify-center px-8 text-center text-white">
+        <div className="h-full w-full overflow-hidden rounded-[40px] bg-primary">
+          <div className="flex h-full flex-col items-center justify-center px-8 text-center text-primary-foreground">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -84,7 +84,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-12 text-lg"
+              className="mb-12 text-lg opacity-90"
             >
               Log in to continue tracking your fitness journey.
             </motion.p>
@@ -104,7 +104,7 @@ export default function LoginPage() {
                     <span
                       className={`flex h-8 w-8 items-center justify-center rounded-full ${
                         step === 1
-                          ? "bg-white text-black"
+                          ? "bg-white text-primary"
                           : "bg-white/20 text-white"
                       }`}
                     >
@@ -144,7 +144,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="mb-8 text-gray-400"
+              className="mb-8 text-muted-foreground"
             >
               Enter your credentials to access your account.
             </motion.p>

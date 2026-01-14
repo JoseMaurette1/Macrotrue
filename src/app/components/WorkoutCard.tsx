@@ -1,82 +1,40 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import WorkoutExercises from "./WorkoutExercises";
+import { Exercise } from "@/lib/api";
 
-type WorkoutType = "upper" | "lower" | "other";
-
-type Set = {
-  weight: number;
-  reps: number;
-  completed?: boolean;
-};
-
-type Exercise = {
-  name: string;
-  sets: Set[];
-  restTimerDuration?: number; // Duration in seconds
-  restTimerRunning?: boolean;
-  restTimerStartTime?: number | null;
-  restTimerElapsedTime?: number;
-};
-
-type Workout = Exercise[];
+type WorkoutType = "upper" | "lower";
 
 interface WorkoutCardProps {
   workoutType: WorkoutType;
-  upperWorkout: Workout;
-  lowerWorkout: Workout;
-  otherWorkout: Workout;
-  setUpperWorkout: React.Dispatch<React.SetStateAction<Workout>>;
-  setLowerWorkout: React.Dispatch<React.SetStateAction<Workout>>;
-  setOtherWorkout: React.Dispatch<React.SetStateAction<Workout>>;
+  upperWorkout: Exercise[];
+  lowerWorkout: Exercise[];
+  setUpperWorkout: React.Dispatch<React.SetStateAction<Exercise[]>>;
+  setLowerWorkout: React.Dispatch<React.SetStateAction<Exercise[]>>;
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({
   workoutType,
   upperWorkout,
   lowerWorkout,
-  otherWorkout,
   setUpperWorkout,
   setLowerWorkout,
-  setOtherWorkout,
 }) => {
+  const title = workoutType === "upper" ? "Upper Body" : "Lower Body";
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold flex items-center justify-between">
-          {workoutType === "upper"
-            ? "Upper Workout"
-            : workoutType === "lower"
-              ? "Lower Workout"
-              : "Other Workout"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {workoutType === "upper" && (
-          <WorkoutExercises
-            workout={upperWorkout}
-            setWorkout={setUpperWorkout}
-            type="upper"
-          />
-        )}
-        {workoutType === "lower" && (
-          <WorkoutExercises
-            workout={lowerWorkout}
-            setWorkout={setLowerWorkout}
-            type="lower"
-          />
-        )}
-        {workoutType === "other" && (
-          <WorkoutExercises
-            workout={otherWorkout}
-            setWorkout={setOtherWorkout}
-            type="other"
-          />
-        )}
-      </CardContent>
-    </Card>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold">{title}</h2>
+        <p className="text-muted-foreground">Complete your workout by tracking each exercise</p>
+      </div>
+      <WorkoutExercises
+        workout={workoutType === "upper" ? upperWorkout : lowerWorkout}
+        setWorkout={workoutType === "upper" ? setUpperWorkout : setLowerWorkout}
+        type={workoutType}
+      />
+    </div>
   );
 };
 

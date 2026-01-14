@@ -1,4 +1,3 @@
-// components/SaveWorkoutButton.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -7,49 +6,28 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { saveWorkoutToSupabase, Workout, WorkoutType } from "@/lib/api";
+import { saveWorkout as saveWorkoutToDb, Workout } from "@/lib/api";
 
+type WorkoutType = "upper" | "lower";
 
 interface SaveWorkoutButtonProps {
-  workoutType: WorkoutType | null;
+  workoutType: WorkoutType;
   upperWorkout: Workout;
   lowerWorkout: Workout;
-  otherWorkout: Workout;
 }
 
 const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
   workoutType,
   upperWorkout,
   lowerWorkout,
-  otherWorkout,
 }) => {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
 
-  // Function to save to both localStorage (for backward compatibility) and Supabase
-  const saveWorkout = async (data: Workout) => {
-    if (!workoutType) return;
-
-    // For backward compatibility, still save to localStorage
-    const savedWorkouts: { date: string; exercises: Workout }[] = JSON.parse(
-      localStorage.getItem(`${workoutType}WorkoutHistory`) || "[]"
-    );
-
-    const workoutWithDate = {
-      date: new Date().toISOString(),
-      exercises: data,
-    };
-
-    savedWorkouts.push(workoutWithDate);
-    localStorage.setItem(
-      `${workoutType}WorkoutHistory`,
-      JSON.stringify(savedWorkouts)
-    );
-
-    // Save to Supabase
+  const handleSaveWorkout = async (data: Workout) => {
     try {
       setIsSaving(true);
-      const success = await saveWorkoutToSupabase(workoutType, data);
+      const success = await saveWorkoutToDb(workoutType, data);
       if (!success) {
         toast.error(
           "Failed to save workout to the database. Please try again."
@@ -69,15 +47,8 @@ const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
         className="w-24"
         disabled={isSaving || !workoutType}
         onClick={async () => {
-          if (!workoutType) return;
-
-          await saveWorkout(
-            workoutType === "upper"
-              ? upperWorkout
-              : workoutType === "lower"
-                ? lowerWorkout
-                : otherWorkout
-          );
+          const workout = workoutType === "upper" ? upperWorkout : lowerWorkout;
+          await handleSaveWorkout(workout);
 
           toast.success("Workout Has Been Saved", {
             action: {

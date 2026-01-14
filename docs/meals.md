@@ -2,13 +2,13 @@
 
 ## Overview
 
-This approach uses a set of preset meals (stored in Supabase) and dynamically adjusts the portion sizes for each meal based on the user's daily calorie goal. The goal is to provide a balanced diet, splitting the total calories evenly across breakfast, lunch, and dinner, and scaling the meal portions so each meal fits its calorie allocation.
+This approach uses a set of preset meals (stored in the Neon PostgreSQL database) and dynamically adjusts the portion sizes for each meal based on the user's daily calorie goal. The goal is to provide a balanced diet, splitting the total calories evenly across breakfast, lunch, and dinner, and scaling the meal portions so each meal fits its calorie allocation.
 
 ## How It Works
 
 1. **Preset Meals in Database:**
 
-   - Meals (e.g., "Rice and Chicken") are stored in Supabase with their base macros and portion sizes (e.g., 100g rice + 100g chicken = 400 kcal).
+   - Meals (e.g., "Rice and Chicken") are stored in Neon with their base macros and portion sizes (e.g., 100g rice + 100g chicken = 400 kcal).
    - Each meal record includes: name, ingredients, base portion size, and macros per base portion.
 
 2. **User Calorie Goal Input:**
@@ -42,9 +42,9 @@ This approach uses a set of preset meals (stored in Supabase) and dynamically ad
 ## Implementation Plan
 
 1. **Database:**
-   - Store preset meals in Supabase with base macros and portion sizes.
+   - Store preset meals in Neon PostgreSQL with base macros and portion sizes.
 2. **Backend/Utils:**
-   - Fetch meals from Supabase.
+   - Fetch meals from database via API routes.
    - Implement a function to calculate scaling factors and adjust portions/macros.
 3. **Frontend:**
    - Collect user calorie goal.
@@ -60,13 +60,13 @@ This approach uses a set of preset meals (stored in Supabase) and dynamically ad
 
 ## Next Steps
 
-- Define the meal schema in Supabase (name, ingredients, base portions, macros).
+- Define the meal schema in Neon (name, ingredients, base portions, macros).
 - Implement the portion scaling algorithm in your utility functions.
 - Build the UI to display meals and scaled portions/macros.
 
 ---
 
-_This approach provides a balanced, data-driven meal plan for any calorie goal, using preset meals and dynamic portion calculation. All logic is handled in-app, with meals managed in Supabase for easy updates._
+_This approach provides a balanced, data-driven meal plan for any calorie goal, using preset meals and dynamic portion calculation. All logic is handled in-app, with meals managed in Neon for easy updates._
 
 ---
 
@@ -74,7 +74,7 @@ _This approach provides a balanced, data-driven meal plan for any calorie goal, 
 
 ### Completed Tasks
 
-- [x] Created database schema in Supabase
+- [x] Created database schema in Neon
   - [x] Created `meal_categories` table (breakfast, lunch, dinner)
   - [x] Created `meals` table with base macros and category relationships
   - [x] Created `meal_ingredients` table with ingredients and portion information
@@ -84,9 +84,9 @@ _This approach provides a balanced, data-driven meal plan for any calorie goal, 
   - [x] Inserted lunch meals with ingredients and macros
   - [x] Inserted dinner meals with ingredients and macros
 - [x] Updated application code
-  - [x] Added Supabase client integration in `mealUtils.ts`
-  - [x] Implemented `fetchMealData()` function to retrieve meals from Supabase
-  - [x] Added fallback to JSON data source if Supabase fetch fails
+  - [x] Added database client integration in `mealUtils.ts`
+  - [x] Implemented `fetchMealData()` function to retrieve meals from database
+  - [x] Added fallback to JSON data source if database fetch fails
   - [x] Implemented `calculateAdjustedMeal()` function to scale portions based on calorie targets
 - [x] Enhanced user interface
   - [x] Updated `Food/page.tsx` with calorie target input form
@@ -95,12 +95,12 @@ _This approach provides a balanced, data-driven meal plan for any calorie goal, 
 
 ### Testing Needed
 
-- [ ] Test Supabase connection with real credentials
+- [ ] Test database connection with real credentials
 - [ ] Verify that all meal data loads correctly from the database
 - [ ] Confirm that the portion scaling algorithm works accurately
 - [ ] Test the calorie target input with various values
 - [ ] Verify that the UI displays adjusted portions and macros correctly
-- [ ] Test the fallback to JSON when Supabase is unavailable
+- [ ] Test the fallback to JSON when database is unavailable
 - [ ] Check that meal refresh functionality works with the database
 
 ### Future Improvements
@@ -121,8 +121,8 @@ _This approach provides a balanced, data-driven meal plan for any calorie goal, 
 ## Recent Codebase Changes (2024-06)
 
 - **Removed unused imports and variables** in `src/app/Food/page.tsx` and `src/app/utils/mealUtils.ts` to resolve ESLint errors and keep the codebase clean.
-- **Ensured all data fetching uses TanStack Query** and the Supabase client, following best practices for React/Next.js data management.
-- **Verified Supabase database schema** matches the structure and requirements of `meals.json` and the implementation plan in this document.
+- **Ensured all data fetching uses TanStack Query** and the database client, following best practices for React/Next.js data management.
+- **Verified database schema** matches the structure and requirements of `meals.json` and the implementation plan in this document.
 - **Cleaned up state and effect logic** in `Food/page.tsx` by removing the unused `calorieInput` state and related code.
 - **Maintained strict adherence to DRY and best practices**: No useEffect for data fetching, all queries are typed, and code is concise and maintainable.
 

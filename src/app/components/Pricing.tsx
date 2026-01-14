@@ -20,7 +20,7 @@ const plans = [
     popular: true,
     features: [
       "Calorie Calculator",
-      "Unlimited Recipe Recommendations",
+      "Extended Recipe Recommendations",
       "Priority support",
       "Advanced Analytics",
     ],
@@ -47,7 +47,7 @@ export default function Pricing() {
 
   return (
     <div
-      className="bg-background py-16 sm:py-24 relative overflow-hidden"
+      className="bg-background py-24 sm:py-32 relative overflow-hidden"
       id="pricing"
     >
       {/* Add background elements */}
@@ -93,7 +93,7 @@ export default function Pricing() {
             Choose the plan that&apos;s right for you.
           </p>
         </motion.div>
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+        <div className="mt-20 grid gap-10 lg:grid-cols-3">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -109,7 +109,7 @@ export default function Pricing() {
                   duration: 0.2,
                   ease: "easeOut",
                 },
-                boxShadow: "0 20px 40px -15px rgba(0,0,0,0.2)",
+                boxShadow: "0 20px 40px -15px hsl(var(--primary)/0.2)",
                 border: "2px solid hsl(var(--primary))",
               }}
               whileTap={{
@@ -128,11 +128,11 @@ export default function Pricing() {
                   </span>
                 </motion.div>
               )}
-              <div className="p-6">
+              <div className="p-8">
                 <h3 className="text-lg font-medium text-foreground">
                   {plan.name}
                 </h3>
-                <p className="mt-4 text-3xl font-extrabold text-foreground">
+                <p className="mt-4 text-4xl font-extrabold text-foreground">
                   {plan.price}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -147,11 +147,11 @@ export default function Pricing() {
                   </Button>
                 </motion.div>
               </div>
-              <div className="px-6 pt-6 pb-8">
+              <div className="px-8 pt-8 pb-10">
                 <h4 className="text-sm font-medium text-foreground tracking-wide uppercase">
                   What&apos;s included
                 </h4>
-                <ul className="mt-6 space-y-4">
+                <ul className="mt-8 space-y-5">
                   {plan.features.map((feature, i) => (
                     <motion.li
                       key={feature}

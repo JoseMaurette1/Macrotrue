@@ -33,12 +33,12 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 
 ### In Progress Features 🚧
 
-1. **Database Migration**
+1. **Database Integration**
 
-   - [ ] Set up Supabase project
-   - [ ] Design database schema
+   - [x] Set up Neon PostgreSQL project
+   - [x] Design database schema with Drizzle ORM
    - [ ] Migrate existing data
-   - [ ] Update API endpoints
+   - [x] Update API endpoints
    - [ ] Implement real-time features
 
 2. **Payment Integration**
@@ -51,11 +51,11 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 
 3. **Workout App Integration**
 
-   - [ ] Identify core components for migration
-   - [ ] Analyze dependencies and conflicts
-   - [ ] Create module structure
-   - [ ] Migrate and adapt components
-   - [ ] Integrate with existing auth system
+   - [x] Identify core components for migration
+   - [x] Analyze dependencies and conflicts
+   - [x] Create module structure
+   - [x] Migrate and adapt components
+   - [x] Integrate with existing auth system
 
 ### Upcoming Features 📋
 
@@ -74,12 +74,12 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 
 ## Immediate Priority Tasks
 
-### 1. Supabase Integration
+### 1. Neon PostgreSQL Integration
 
 1. **Initial Setup**
 
-   - Create Supabase project
-   - Configure authentication
+   - Create Neon project
+   - Configure Drizzle ORM
    - Set up database tables
    - Define access policies
 
@@ -148,7 +148,8 @@ This document outlines the development plan for Macrotrue, a SaaS application th
 - TypeScript
 - Authentication: Clerk
 - UI: Shadcn UI
-- Database: Supabase
+- Database: Neon PostgreSQL
+- ORM: Drizzle
 - Payments: Stripe
 - Icons: lucide-react
 
@@ -371,7 +372,7 @@ This plan should be reviewed weekly to track progress and adjust priorities as n
 
 ### Next Steps
 
-1. Set up Supabase project and configure initial settings
+1. Set up Neon PostgreSQL project and configure initial settings
 2. Create database schema and migration plan
 3. Set up Stripe account and test environment
 4. Begin workout app component analysis

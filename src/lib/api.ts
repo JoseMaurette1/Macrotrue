@@ -1,6 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth";
-
-export type WorkoutType = "upper" | "lower" | "other";
+export type WorkoutType = "upper" | "lower";
 
 export type Set = {
   weight: number;
@@ -26,88 +24,56 @@ export interface WorkoutEntry {
   workoutType: WorkoutType;
 }
 
-const safeLocalStorage = {
-  getItem: (key: string): string | null => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(key);
-  },
-  setItem: (key: string, value: string): void => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(key, value);
-  },
-  removeItem: (key: string): void => {
-    if (typeof window === "undefined") return;
-    localStorage.removeItem(key);
-  },
-};
-
-const getStorageKey = (workoutType: WorkoutType, userId: string): string => {
-  return `${workoutType}WorkoutHistory_${userId}`;
-};
-
-export const saveWorkoutToStorage = async (
+export const saveWorkout = async (
   workoutType: WorkoutType,
   exercises: Workout
 ): Promise<boolean> => {
   try {
-    const userId = await getCurrentUserId();
-    const storageKey = getStorageKey(workoutType, userId);
-    
-    const existingData = safeLocalStorage.getItem(storageKey);
-    const existingWorkouts: WorkoutEntry[] = existingData 
-      ? JSON.parse(existingData) 
-      : [];
-    
-    const newEntry: WorkoutEntry = {
-      id: `workout_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      date: new Date().toISOString(),
-      exercises,
-      workoutType,
-    };
-    
-    existingWorkouts.unshift(newEntry);
-    
-    safeLocalStorage.setItem(storageKey, JSON.stringify(existingWorkouts));
-    
+    const response = await fetch("/api/workouts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ workoutType, exercises }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("API error:", error);
+      return false;
+    }
+
     return true;
   } catch (error) {
-    console.error("Error in saveWorkoutToStorage:", error);
+    console.error("Error saving workout:", error);
     return false;
   }
 };
 
 export const getWorkoutHistory = async (
-  workoutType: WorkoutType
+  workoutType?: WorkoutType
 ): Promise<WorkoutEntry[]> => {
   try {
-    const userId = await getCurrentUserId();
-    const storageKey = getStorageKey(workoutType, userId);
-    
-    const legacyKey = `${workoutType}WorkoutHistory`;
-    const legacyData = safeLocalStorage.getItem(legacyKey);
-    
-    const newData = safeLocalStorage.getItem(storageKey);
-    
-    let workouts: WorkoutEntry[] = [];
-    
-    if (newData) {
-      workouts = JSON.parse(newData);
+    const url = workoutType
+      ? `/api/workouts?type=${workoutType}`
+      : "/api/workouts";
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error("Failed to fetch workouts");
+      return [];
     }
-    
-    if (legacyData) {
-      const legacyWorkouts = JSON.parse(legacyData);
-      const formattedLegacy = legacyWorkouts.map((entry: Record<string, unknown>) => ({
-        id: entry.id || `legacy_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        date: entry.date as string,
-        exercises: entry.exercises as Exercise[],
-        workoutType,
-      }));
-      
-      workouts = [...workouts, ...formattedLegacy];
-    }
-    
-    return workouts.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+
+    const data = await response.json();
+
+    return data.workouts.map(
+      (w: { id: string; createdAt: string; exercises: Exercise[]; workoutType: WorkoutType }) => ({
+        id: w.id,
+        date: w.createdAt,
+        exercises: w.exercises as Exercise[],
+        workoutType: w.workoutType as WorkoutType,
+      })
     );
   } catch (error) {
     console.error("Error in getWorkoutHistory:", error);
@@ -118,20 +84,7 @@ export const getWorkoutHistory = async (
 export const clearWorkoutHistory = async (
   workoutType: WorkoutType
 ): Promise<boolean> => {
-  try {
-    const userId = await getCurrentUserId();
-    const storageKey = getStorageKey(workoutType, userId);
-    
-    safeLocalStorage.removeItem(storageKey);
-    
-    const legacyKey = `${workoutType}WorkoutHistory`;
-    safeLocalStorage.removeItem(legacyKey);
-    
-    return true;
-  } catch (error) {
-    console.error("Error in clearWorkoutHistory:", error);
-    return false;
-  }
+  void workoutType;
+  console.warn("clearWorkoutHistory not implemented for database");
+  return false;
 };
-
-export const saveWorkoutToSupabase = saveWorkoutToStorage;

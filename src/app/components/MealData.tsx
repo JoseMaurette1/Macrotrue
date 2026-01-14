@@ -3,12 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MealCategory, Meal, MealIndexes } from "@/app/types/meals";
-import {
-  fetchMealData,
-  generateRandomMealIndexes,
-  calculateAdjustedMeal,
-} from "@/app/utils/mealUtils";
+
+interface Meal {
+  name: string;
+  portions: string;
+  macros: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+}
 
 interface MealDataProps {
   onRefresh: () => void;
@@ -17,64 +22,88 @@ interface MealDataProps {
   targetCalories?: number | null;
 }
 
+interface AIMealResponse {
+  breakfast: Meal;
+  lunch: Meal;
+  dinner: Meal;
+  total: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+}
+
 const MealData = ({
   onRefresh,
   refreshCount,
   maxRefreshes,
   targetCalories,
 }: MealDataProps) => {
-  const [mealData, setMealData] = useState<MealCategory | null>(null);
+  const [aiMeals, setAiMeals] = useState<AIMealResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mealIndexes, setMealIndexes] = useState<MealIndexes>({
-    breakfast: 0,
-    lunch: 0,
-    dinner: 0,
-  });
 
   useEffect(() => {
-    const getMealData = async () => {
+    const fetchMeals = async () => {
       setIsLoading(true);
       setError(null);
 
+      if (!targetCalories || targetCalories < 1000) {
+        setError("Please set a calorie goal in the Calculator first");
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const data = await fetchMealData();
-        
-        if (data && Object.values(data).some((arr) => arr.length > 0)) {
-          setMealData(data);
-        } else {
-          setMealData({
-            breakfast: [],
-            lunch: [],
-            dinner: [],
-          });
+        const response = await fetch(
+          `/api/meal-recommendations?calories=${targetCalories}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to generate meals");
         }
-      } catch (fetchError) {
-        console.error("Failed to fetch meal data:", fetchError);
-        setError("Failed to load meal data");
-        setMealData({
-          breakfast: [],
-          lunch: [],
-          dinner: [],
-        });
+
+        const data = await response.json();
+        if (data.breakfast && data.lunch && data.dinner) {
+          setAiMeals(data);
+        } else {
+          throw new Error("Invalid response from meal generator");
+        }
+      } catch (err) {
+        console.error("Failed to fetch AI meals:", err);
+        setError("Failed to generate meals. Please try again.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    getMealData();
-  }, []);
+    fetchMeals();
+  }, [targetCalories]);
 
-  useEffect(() => {
-    if (mealData) {
-      setMealIndexes(generateRandomMealIndexes(mealData));
-    }
-  }, [mealData]);
+  const handleRefresh = async () => {
+    if (!targetCalories || targetCalories < 1000) return;
 
-  const handleRefresh = () => {
-    if (!mealData) return;
-    setMealIndexes(generateRandomMealIndexes(mealData));
     onRefresh();
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/meal-recommendations?calories=${targetCalories}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.breakfast && data.lunch && data.dinner) {
+          setAiMeals(data);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to refresh meals:", err);
+      setError("Failed to refresh meals. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isRefreshDisabled = refreshCount >= maxRefreshes;
@@ -86,72 +115,49 @@ const MealData = ({
   if (isLoading) {
     return (
       <div className="container py-8 flex justify-center items-center">
-        <p>Loading meal data...</p>
+        <p>Generating personalized meals...</p>
       </div>
     );
   }
 
-  if (error || !mealData) {
+  if (error) {
     return (
       <div className="container py-8 flex flex-col justify-center items-center space-y-4">
-        <p className="text-red-500">{error || "Failed to load meal data"}</p>
+        <p className="text-red-500">{error}</p>
         <Button
           onClick={() => window.location.reload()}
           className="bg-primary text-white"
         >
-          Refresh Page
+          Try Again
         </Button>
       </div>
     );
   }
 
-  const hasAnyMeals = Object.values(mealData).some(
-    (category) => category.length > 0
-  );
-
-  if (!hasAnyMeals) {
+  if (!aiMeals) {
     return (
       <div className="container py-8 flex flex-col justify-center items-center space-y-4">
-        <p className="text-amber-500">
-          No meal data available. Please check back later.
-        </p>
+        <p className="text-amber-500">No meals available</p>
         <Button
           onClick={() => window.location.reload()}
           className="bg-primary text-white"
         >
-          Refresh Page
+          Refresh
         </Button>
       </div>
     );
   }
 
-  const getCaloriesPerMeal = () => {
-    if (!targetCalories) return null;
-    return Math.round(targetCalories / 3);
-  };
-
-  const caloriesPerMeal = getCaloriesPerMeal();
-
-  const renderMealCard = (category: string, meals: Meal[]) => {
-    if (meals.length === 0) return null;
-
-    const mealIndex = mealIndexes[category as keyof MealIndexes];
-    const safeIndex = meals.length > 0 ? mealIndex % meals.length : 0;
-    let meal = meals[safeIndex];
-
-    if (caloriesPerMeal && meal) {
-      meal = calculateAdjustedMeal(meal, caloriesPerMeal);
-    }
+  const renderMealCard = (category: string, meal: Meal) => {
+    if (!meal) return null;
 
     return (
       <div key={category} className="space-y-4">
         <h2 className="text-3xl font-bold tracking-tight capitalize">
           {category}
-          {caloriesPerMeal && (
-            <span className="text-sm ml-2 font-normal text-muted-foreground">
-              Target: {caloriesPerMeal} cal
-            </span>
-          )}
+          <span className="text-sm ml-2 font-normal text-muted-foreground">
+            {meal.macros.calories} cal
+          </span>
         </h2>
         <div className="grid gap-6">
           <Card className="border-border">
@@ -192,9 +198,9 @@ const MealData = ({
       transition={{ duration: 0.5 }}
       className="container py-8 space-y-8"
     >
-      {Object.entries(mealData).map(([category, meals]) =>
-        renderMealCard(category, meals as Meal[])
-      )}
+      {renderMealCard("breakfast", aiMeals.breakfast)}
+      {renderMealCard("lunch", aiMeals.lunch)}
+      {renderMealCard("dinner", aiMeals.dinner)}
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}

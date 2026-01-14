@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type WorkoutType = "upper" | "lower" | "other";
+type WorkoutType = "upper" | "lower";
 
 type Set = {
   weight: number;
@@ -23,7 +23,7 @@ type Set = {
 type Exercise = {
   name: string;
   sets: Set[];
-  restTimerDuration?: number; // Duration in seconds
+  restTimerDuration?: number;
   restTimerRunning?: boolean;
   restTimerStartTime?: number | null;
   restTimerElapsedTime?: number;
@@ -54,11 +54,11 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
       const updatedWorkout = prevWorkout.map((exercise, i) =>
         i === exerciseIndex
           ? {
-            ...exercise,
-            sets: exercise.sets.map((set, j) =>
-              j === setIndex ? { ...set, [key]: value } : set
-            ),
-          }
+              ...exercise,
+              sets: exercise.sets.map((set, j) =>
+                j === setIndex ? { ...set, [key]: value } : set
+              ),
+            }
           : exercise
       );
 
@@ -75,7 +75,6 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
             j === setIndex ? { ...set, completed: !set.completed } : set
           );
 
-          // Start timer when set is completed
           const updatedExercise = {
             ...exercise,
             sets: updatedSets,
@@ -99,9 +98,9 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
       const updatedWorkout = prevWorkout.map((exercise, i) =>
         i === exerciseIndex
           ? {
-            ...exercise,
-            restTimerDuration: duration,
-          }
+              ...exercise,
+              restTimerDuration: duration,
+            }
           : exercise
       );
 
@@ -115,9 +114,9 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
       const updatedWorkout = prevWorkout.map((exercise, i) =>
         i === exerciseIndex
           ? {
-            ...exercise,
-            sets: [...exercise.sets, { weight: 0, reps: 0 }], // Add a new set with default values
-          }
+              ...exercise,
+              sets: [...exercise.sets, { weight: 0, reps: 0 }],
+            }
           : exercise
       );
 
@@ -131,9 +130,9 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
       const updatedWorkout = prevWorkout.map((exercise, i) =>
         i === exerciseIndex
           ? {
-            ...exercise,
-            sets: exercise.sets.filter((_, j) => j !== setIndex), // Remove the set at setIndex
-          }
+              ...exercise,
+              sets: exercise.sets.filter((_, j) => j !== setIndex),
+            }
           : exercise
       );
 
@@ -143,7 +142,7 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
   };
 
   const formatTime = (ms: number, duration: number) => {
-    const remainingTime = Math.max(0, duration * 1000 - ms); // Calculate remaining time
+    const remainingTime = Math.max(0, duration * 1000 - ms);
     const totalSeconds = Math.ceil(remainingTime / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -152,133 +151,144 @@ const WorkoutExercises: React.FC<WorkoutExercisesProps> = ({
       .padStart(2, "0")}`;
   };
 
-  return workout.map((exercise, exerciseIndex) => (
-    <Card key={exercise.name} className="mb-4">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">
-            {exercise.name}
-          </CardTitle>
-          <div className="sm:flex sm:flex-col sm:items-end space-y-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Rest: {exercise.restTimerDuration}s
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                {restOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={option}
-                    onClick={() => handleRestTimerSelect(exerciseIndex, option)}
+  return (
+    <div className="space-y-6">
+      {workout.map((exercise, exerciseIndex) => (
+        <Card key={exercise.name} className="overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-semibold">
+                {exercise.name}
+              </CardTitle>
+              <div className="flex items-center gap-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Rest: {exercise.restTimerDuration}s
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    {restOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option}
+                        onClick={() => handleRestTimerSelect(exerciseIndex, option)}
+                      >
+                        {option} seconds
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="flex items-center gap-2">
+                  <Timer
+                    className={
+                      exercise.restTimerRunning
+                        ? "text-green-500"
+                        : "text-muted-foreground"
+                    }
+                  />
+                  <span className="font-mono text-sm">
+                    {formatTime(
+                      exercise.restTimerElapsedTime || 0,
+                      exercise.restTimerDuration || 60
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {/* Sets Header */}
+            <div className="grid grid-cols-12 gap-4 p-4 bg-muted/20 text-sm font-medium text-muted-foreground border-b">
+              <div className="col-span-1 text-center">#</div>
+              <div className="col-span-4 text-center">Weight (lbs)</div>
+              <div className="col-span-4 text-center">Reps</div>
+              <div className="col-span-3 text-center">Done</div>
+            </div>
+
+            {/* Sets Rows */}
+            {exercise.sets.map((set, setIndex) => (
+              <div
+                key={setIndex}
+                className="grid grid-cols-12 gap-4 p-4 border-b last:border-0 items-center hover:bg-muted/10 transition-colors"
+              >
+                <div className="col-span-1 text-center text-muted-foreground font-medium">
+                  {setIndex + 1}
+                </div>
+                <div className="col-span-4">
+                  <Input
+                    id={`weight-${exerciseIndex}-${setIndex}`}
+                    type="number"
+                    value={set.weight === 0 ? "" : set.weight?.toString()}
+                    placeholder="0"
+                    onChange={(e) => {
+                      const newValue = e.target.value
+                        ? parseFloat(e.target.value)
+                        : 0;
+                      handleUpdateSet(exerciseIndex, setIndex, "weight", newValue);
+                    }}
+                    className="text-center"
+                  />
+                </div>
+                <div className="col-span-4">
+                  <Input
+                    id={`reps-${exerciseIndex}-${setIndex}`}
+                    type="number"
+                    value={set.reps === 0 ? "" : set.reps?.toString()}
+                    placeholder="0"
+                    onChange={(e) => {
+                      const newValue = e.target.value
+                        ? parseInt(e.target.value, 10)
+                        : 0;
+                      handleUpdateSet(exerciseIndex, setIndex, "reps", newValue);
+                    }}
+                    className="text-center"
+                  />
+                </div>
+                <div className="col-span-3 flex justify-center">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSetCompletion(exerciseIndex, setIndex)}
+                    className="hover:bg-transparent"
                   >
-                    {option} seconds
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <div className="flex items-center">
-              <Timer
-                className={
-                  exercise.restTimerRunning ? "text-green-500" : "text-gray-500"
-                }
-              />
-              <span>
-                {formatTime(
-                  exercise.restTimerElapsedTime || 0,
-                  exercise.restTimerDuration || 60
-                )}
-              </span>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {exercise.sets.map((set, setIndex) => (
-          <div key={setIndex} className="flex items-center space-x-2 mb-2">
-            <div className="flex flex-col">
-              <label
-                htmlFor={`weight-${exerciseIndex}-${setIndex}`}
-                className="text-sm text-gray-600"
-              >
-                Lbs
-              </label>
-              <Input
-                id={`weight-${exerciseIndex}-${setIndex}`}
-                type="number"
-                value={set.weight === 0 ? "" : set.weight?.toString()}
-                placeholder={set.weight === 0 ? "0" : ""}
-                onChange={(e) => {
-                  const newValue = e.target.value
-                    ? parseFloat(e.target.value)
-                    : 0;
-                  handleUpdateSet(exerciseIndex, setIndex, "weight", newValue);
-                }}
-                className="w-20"
-              />
-            </div>
+                    {set.completed ? (
+                      <CheckCircle className="text-green-500 w-6 h-6" />
+                    ) : (
+                      <CheckCircle className="text-muted-foreground/40 w-6 h-6" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            ))}
 
-            <div className="flex flex-col">
-              <label
-                htmlFor={`reps-${exerciseIndex}-${setIndex}`}
-                className="text-sm text-gray-600"
+            {/* Add/Remove Buttons */}
+            <div className="flex gap-3 p-4 bg-muted/10">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => handleAddSet(exerciseIndex)}
               >
-                Reps
-              </label>
-              <Input
-                id={`reps-${exerciseIndex}-${setIndex}`}
-                type="number"
-                value={set.reps === 0 ? "" : set.reps?.toString()}
-                placeholder={set.reps === 0 ? "0" : ""}
-                onChange={(e) => {
-                  const newValue = e.target.value
-                    ? parseInt(e.target.value, 10)
-                    : 0;
-                  handleUpdateSet(exerciseIndex, setIndex, "reps", newValue);
-                }}
-                className="w-20"
-              />
-            </div>
-
-            <span className="text-sm text-gray-500">Set {setIndex + 1}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleSetCompletion(exerciseIndex, setIndex)}
-            >
-              {set.completed ? (
-                <CheckCircle className="text-green-500" />
-              ) : (
-                <CheckCircle className="text-gray-300" />
+                <Plus className="w-4 h-4 mr-2" />
+                Add Set
+              </Button>
+              {exercise.sets.length > 1 && (
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() =>
+                    handleRemoveSet(exerciseIndex, exercise.sets.length - 1)
+                  }
+                >
+                  <Minus className="w-4 h-4 mr-2" />
+                  Remove Set
+                </Button>
               )}
-            </Button>
-          </div>
-        ))}
-        <div className="flex flex-col w-full">
-          <Button
-            variant="outline"
-            className="w-full mb-2"
-            onClick={() => handleAddSet(exerciseIndex)}
-          >
-            Add
-            <Plus className="" />
-          </Button>
-          {exercise.sets.length > 1 && (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() =>
-                handleRemoveSet(exerciseIndex, exercise.sets.length - 1)
-              }
-            >
-              Remove
-              <Minus className="" />
-            </Button>
-          )}
-        </div>{" "}
-      </CardContent>
-    </Card>
-  ));
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
 };
 
 export default WorkoutExercises;

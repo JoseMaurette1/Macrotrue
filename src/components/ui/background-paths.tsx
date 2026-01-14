@@ -14,14 +14,13 @@ function FloatingPaths({ position }: { position: number }) {
     } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
       684 - i * 5 * position
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    color: `rgba(59,130,246,${0.1 + i * 0.03})`,
     width: 0.5 + i * 0.03,
   }));
 
   return (
     <div className="absolute inset-0 pointer-events-none">
       <svg
-        className="w-full h-full text-blue-500 dark:text-blue-400"
+        className="w-full h-full text-primary"
         viewBox="0 0 696 316"
         fill="none"
       >
@@ -59,7 +58,7 @@ export function BackgroundPaths({
   const words = title.split(" ");
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white dark:bg-gray-950">
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-background">
       <div className="absolute inset-0">
         <FloatingPaths position={1} />
         <FloatingPaths position={-1} />
@@ -86,9 +85,7 @@ export function BackgroundPaths({
                       stiffness: 150,
                       damping: 25,
                     }}
-                    className="inline-block text-transparent bg-clip-text
-                                        bg-gradient-to-r from-blue-600 to-blue-400
-                                        dark:from-blue-300 dark:to-blue-500"
+                    className="inline-block text-primary"
                   >
                     {letter}
                   </motion.span>
@@ -98,18 +95,18 @@ export function BackgroundPaths({
           </h1>
 
           <div
-            className="inline-block group relative bg-white border border-blue-200
-                        dark:bg-gray-900 dark:border-blue-700/50 p-px rounded-2xl
+            className="inline-block group relative bg-card border border-border
+                        p-px rounded-2xl
                         overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <Link href="/Calculator" className="inline-block">
               <Button
                 variant="ghost"
                 className="rounded-[1.15rem] px-8 py-6 text-lg font-semibold
-                                bg-white hover:bg-white/90 dark:bg-gray-900 dark:hover:bg-gray-900/90
-                                text-blue-700 dark:text-blue-100 transition-all duration-300
-                                group-hover:-translate-y-0.5 border border-blue-200 dark:border-blue-700/50
-                                hover:shadow-md dark:hover:shadow-blue-800/50"
+                                bg-card hover:bg-card/90
+                                text-primary transition-all duration-300
+                                group-hover:-translate-y-0.5 border border-border
+                                hover:shadow-md"
               >
                 Get Started
                 <span
