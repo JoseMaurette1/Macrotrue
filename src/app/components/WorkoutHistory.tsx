@@ -13,9 +13,6 @@ import {
 
 import { toast } from "sonner";
 
-// Disable ESLint any type warning for this file
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export default function WorkoutHistory() {
   const [upperWorkoutHistory, setUpperWorkoutHistory] = useState<
     WorkoutEntry[]
@@ -29,64 +26,18 @@ export default function WorkoutHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [isClearing, setIsClearing] = useState<WorkoutType | null>(null);
 
-  // Function to load workout history from both localStorage and Supabase
   const loadWorkoutHistory = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Load from localStorage for backward compatibility
-      const storedUpper = localStorage.getItem("upperWorkoutHistory");
-      const storedLower = localStorage.getItem("lowerWorkoutHistory");
-      const storedOther = localStorage.getItem("otherWorkoutHistory");
-
-      // Create arrays to hold merged data
-      let upperWorkouts: WorkoutEntry[] = [];
-      let lowerWorkouts: WorkoutEntry[] = [];
-      let otherWorkouts: WorkoutEntry[] = [];
-
-      // Process localStorage data
-      if (storedUpper) {
-        const parsedUpper = JSON.parse(storedUpper);
-        upperWorkouts = parsedUpper.map((entry: Record<string, unknown>) => ({
-          date: entry.date as string,
-          exercises: entry.exercises as any[],
-          workoutType: "upper" as WorkoutType,
-        }));
-      }
-
-      if (storedLower) {
-        const parsedLower = JSON.parse(storedLower);
-        lowerWorkouts = parsedLower.map((entry: Record<string, unknown>) => ({
-          date: entry.date as string,
-          exercises: entry.exercises as any[],
-          workoutType: "lower" as WorkoutType,
-        }));
-      }
-
-      if (storedOther) {
-        const parsedOther = JSON.parse(storedOther);
-        otherWorkouts = parsedOther.map((entry: Record<string, unknown>) => ({
-          date: entry.date as string,
-          exercises: entry.exercises as any[],
-          workoutType: "other" as WorkoutType,
-        }));
-      }
-
-      // Fetch from Supabase
-      const [supabaseUpper, supabaseLower, supabaseOther] = await Promise.all([
+      const [upper, lower, other] = await Promise.all([
         getWorkoutHistory("upper"),
         getWorkoutHistory("lower"),
         getWorkoutHistory("other"),
       ]);
 
-      // Merge data (prefer Supabase data)
-      const mergedUpper = [...upperWorkouts, ...supabaseUpper];
-      const mergedLower = [...lowerWorkouts, ...supabaseLower];
-      const mergedOther = [...otherWorkouts, ...supabaseOther];
-
-      // Sort by date (newest first)
-      setUpperWorkoutHistory(sortWorkouts(mergedUpper));
-      setLowerWorkoutHistory(sortWorkouts(mergedLower));
-      setOtherWorkoutHistory(sortWorkouts(mergedOther));
+      setUpperWorkoutHistory(upper);
+      setLowerWorkoutHistory(lower);
+      setOtherWorkoutHistory(other);
     } catch (error) {
       console.error("Error loading workout history:", error);
       toast.error("Failed to load workout history");
@@ -99,23 +50,12 @@ export default function WorkoutHistory() {
     loadWorkoutHistory();
   }, [loadWorkoutHistory]);
 
-  const sortWorkouts = (workoutHistory: WorkoutEntry[]): WorkoutEntry[] => {
-    return [...workoutHistory].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-  };
-
   const clearHistory = async (type: WorkoutType) => {
     try {
       setIsClearing(type);
 
-      // Clear localStorage
-      localStorage.removeItem(`${type}WorkoutHistory`);
-
-      // Clear Supabase
       await clearWorkoutHistory(type);
 
-      // Update state
       if (type === "upper") {
         setUpperWorkoutHistory([]);
       } else if (type === "lower") {

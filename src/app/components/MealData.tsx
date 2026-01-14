@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { MealCategory, Meal, MealIndexes } from "@/app/types/meals";
 import {
   fetchMealData,
-  fetchMealDataFromJson,
   generateRandomMealIndexes,
   calculateAdjustedMeal,
 } from "@/app/utils/mealUtils";
@@ -27,85 +26,38 @@ const MealData = ({
   const [mealData, setMealData] = useState<MealCategory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dataSource, setDataSource] = useState<"supabase" | "json" | "none">(
-    "none"
-  );
   const [mealIndexes, setMealIndexes] = useState<MealIndexes>({
     breakfast: 0,
     lunch: 0,
     dinner: 0,
   });
 
-  // Fetch meal data
   useEffect(() => {
     const getMealData = async () => {
       setIsLoading(true);
       setError(null);
 
-      // Always load JSON data first as a safety measure
-      let jsonData: MealCategory | null = null;
-
       try {
-        jsonData = await fetchMealDataFromJson();
-        console.log("Successfully loaded JSON fallback data");
-      } catch (jsonError) {
-        console.error("Failed to load JSON fallback data:", jsonError);
-      }
-
-      // If we don't have valid JSON data as a fallback, create an empty structure
-      if (!jsonData || !Object.values(jsonData).some((arr) => arr.length > 0)) {
-        jsonData = {
+        const data = await fetchMealData();
+        
+        if (data && Object.values(data).some((arr) => arr.length > 0)) {
+          setMealData(data);
+        } else {
+          setMealData({
+            breakfast: [],
+            lunch: [],
+            dinner: [],
+          });
+        }
+      } catch (fetchError) {
+        console.error("Failed to fetch meal data:", fetchError);
+        setError("Failed to load meal data");
+        setMealData({
           breakfast: [],
           lunch: [],
           dinner: [],
-        };
-      }
-
-      // Now try Supabase with a simple timeout to avoid hanging
-      try {
-        // Wrap the actual fetch in another try-catch to handle empty error objects
-        let supabaseData: MealCategory | null = null;
-
-        try {
-          supabaseData = await Promise.race([
-            fetchMealData(),
-            new Promise<MealCategory>((_, reject) => {
-              setTimeout(
-                () => reject(new Error("Supabase connection timeout")),
-                5000
-              );
-            }),
-          ]);
-        } catch (innerError) {
-          console.error("Inner error fetching data from Supabase:", innerError);
-          // Force continue to JSON fallback
-          throw new Error(
-            "Forcing fallback to JSON due to Supabase fetch error"
-          );
-        }
-
-        // Only use the data if it has content
-        if (
-          supabaseData &&
-          Object.values(supabaseData).some((arr) => arr.length > 0)
-        ) {
-          console.log("Successfully loaded data from Supabase");
-          setMealData(supabaseData);
-          setDataSource("supabase");
-          setIsLoading(false);
-        } else {
-          console.warn("Supabase returned empty data, using JSON fallback");
-          setMealData(jsonData);
-          setDataSource("json");
-          setIsLoading(false);
-        }
-      } catch (supabaseError) {
-        console.error("Failed to fetch from Supabase:", supabaseError);
-
-        // Always show JSON data if we have it, even on error
-        console.log("Using JSON fallback data after Supabase error");
-        setMealData(jsonData);
-        setDataSource("json");
+        });
+      } finally {
         setIsLoading(false);
       }
     };
@@ -113,7 +65,6 @@ const MealData = ({
     getMealData();
   }, []);
 
-  // Generate random meal indexes on initial load
   useEffect(() => {
     if (mealData) {
       setMealIndexes(generateRandomMealIndexes(mealData));
@@ -154,7 +105,6 @@ const MealData = ({
     );
   }
 
-  // Check if we have any data to display
   const hasAnyMeals = Object.values(mealData).some(
     (category) => category.length > 0
   );
@@ -175,26 +125,20 @@ const MealData = ({
     );
   }
 
-  // Calculate calories per meal if target calories are provided
   const getCaloriesPerMeal = () => {
     if (!targetCalories) return null;
-
-    // Divide the total calories evenly across three meals
     return Math.round(targetCalories / 3);
   };
 
   const caloriesPerMeal = getCaloriesPerMeal();
 
   const renderMealCard = (category: string, meals: Meal[]) => {
-    // Skip rendering if no meals for this category
     if (meals.length === 0) return null;
 
     const mealIndex = mealIndexes[category as keyof MealIndexes];
-    // Handle potential index out of bounds
     const safeIndex = meals.length > 0 ? mealIndex % meals.length : 0;
     let meal = meals[safeIndex];
 
-    // If target calories are set, adjust the meal portions and macros
     if (caloriesPerMeal && meal) {
       meal = calculateAdjustedMeal(meal, caloriesPerMeal);
     }
@@ -248,12 +192,6 @@ const MealData = ({
       transition={{ duration: 0.5 }}
       className="container py-8 space-y-8"
     >
-      {dataSource === "json" && (
-        <div className="text-amber-500 text-sm text-center mb-2">
-          Using fallback meal data. Some features may be limited.
-        </div>
-      )}
-
       {Object.entries(mealData).map(([category, meals]) =>
         renderMealCard(category, meals as Meal[])
       )}
