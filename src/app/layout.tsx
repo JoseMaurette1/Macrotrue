@@ -31,16 +31,6 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/icons/icon-192x192.svg", sizes: "192x192", type: "image/svg+xml" },
-      { url: "/icons/icon-512x512.svg", sizes: "512x512", type: "image/svg+xml" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.svg", sizes: "180x180", type: "image/svg+xml" },
-    ],
-  },
   applicationName: "Macrotrue",
   keywords: ["fitness", "meal tracking", "calorie counter", "workout", "health"],
   authors: [{ name: "Macrotrue Team" }],
@@ -56,13 +46,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Macrotrue" />
-        <meta name="mobile-web-app-capable" content="yes" />
-      </head>
       <body className={inter.className}>
         <ClerkProvider
           appearance={{

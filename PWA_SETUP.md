@@ -75,6 +75,8 @@ PWA configuration is located in:
 
 ## 🎨 Customizing
 
-- **Icons**: SVG icons are in `public/icons/`. Replace them if you have a custom logo.
+- **Icons**:
+  - **iOS/Favicon**: Dynamically generated via `src/app/apple-icon.tsx` and `src/app/icon.tsx`. Modify these files to change the logo.
+  - **Android/Manifest**: SVG icons in `public/icons/`. Replace these if you have a custom logo (keep the filenames/sizes).
 - **Colors**: Theme color is set in `src/app/manifest.ts` and `src/app/layout.tsx`.
 - **Install Prompt**: Modify `src/components/pwa/InstallPrompt.tsx` to change the UI.
