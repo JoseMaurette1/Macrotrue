@@ -104,17 +104,26 @@ export default function CalorieCalculator() {
     setSelectedCalories(calories);
     setIsSaving(true);
     try {
-      await fetch("/api/goals", {
+      const response = await fetch("/api/goals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ calorieGoal: calories }),
       });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save calorie goal");
+      }
+      
+      // Wait a bit to ensure the save is committed
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      router.push('/Food');
     } catch (error) {
       console.error("Error saving goal:", error);
+      alert("Failed to save calorie goal. Please try again.");
     } finally {
       setIsSaving(false);
     }
-    router.push('/Food');
   };
 
   return (

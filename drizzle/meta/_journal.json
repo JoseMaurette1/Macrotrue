@@ -8,6 +8,13 @@
       "when": 1768362194003,
       "tag": "0000_melted_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768686481795,
+      "tag": "0001_hesitant_vision",
+      "breakpoints": true
     }
   ]
 }
