@@ -15,7 +15,7 @@ export default function PantryChat() {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: "assistant", 
-      content: "Hi! I'm your Pantry Chef. Tell me what ingredients you have, and I'll suggest some delicious meals! 🍳" 
+      content: "Hi! I'm your Pantry Chef. Tell me what ingredients you have (and any calorie targets), and I'll suggest delicious meals with full macro breakdowns! 🍳" 
     }
   ]);
   const [input, setInput] = useState("");
