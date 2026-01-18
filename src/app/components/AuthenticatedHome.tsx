@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Header from "./Header";
 import MemberHeader from "./MemberHeader";
@@ -13,7 +12,6 @@ import Questions from "./Questions";
 import CTA from "./CTA";
 import Footer from "./Footer";
 import CalorieCalculator from "./CalorieCalculator";
-import { ArrowRight, Utensils } from "lucide-react";
 import AuthenticatedHomePage from "@/components/ui/AuthenticatedHome";
 
 export default function AuthenticatedHome() {

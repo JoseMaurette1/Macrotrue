@@ -1,6 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
 // Clerk CSP headers required for OAuth
 const clerkCspHeaders = {
@@ -48,7 +47,7 @@ const addCspHeaders = (response: NextResponse): NextResponse => {
   return response;
 };
 
-export default clerkMiddleware((_auth, req: NextRequest) => {
+export default clerkMiddleware(() => {
   const response = NextResponse.next();
   addCspHeaders(response);
   return response;

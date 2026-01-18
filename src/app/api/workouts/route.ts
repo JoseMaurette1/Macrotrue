@@ -92,9 +92,9 @@ export async function POST(request: NextRequest) {
 
     const exercisesJson = JSON.stringify(exercises);
     const insertResult = await db.execute(sql`
-      insert into workouts (${sql.identifier([idColumn])}, workout_type, exercises, created_at)
+      insert into workouts (${sql.identifier(idColumn)}, workout_type, exercises, created_at)
       values (${userId}, ${workoutType}, ${exercisesJson}::jsonb, ${new Date()})
-      returning id, ${sql.identifier([idColumn])}, workout_type, exercises, created_at
+      returning id, ${sql.identifier(idColumn)}, workout_type, exercises, created_at
     `);
 
     const newWorkout = normalizeWorkout(insertResult.rows[0]);
@@ -130,9 +130,9 @@ export async function GET(request: NextRequest) {
     const idColumn = await getWorkoutsIdColumn();
 
     const workoutsResult = await db.execute(sql`
-      select id, ${sql.identifier([idColumn])}, workout_type, exercises, created_at
+      select id, ${sql.identifier(idColumn)}, workout_type, exercises, created_at
       from workouts
-      where ${sql.identifier([idColumn])} = ${userId}
+      where ${sql.identifier(idColumn)} = ${userId}
       order by created_at desc
     `);
 

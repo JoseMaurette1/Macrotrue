@@ -49,7 +49,7 @@ export async function GET() {
     const goalResult = await db.execute(sql`
       select calorie_goal
       from user_goals
-      where ${sql.identifier([idColumn])} = ${userId}
+      where ${sql.identifier(idColumn)} = ${userId}
       limit 1
     `);
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     const existingResult = await db.execute(sql`
       select id
       from user_goals
-      where ${sql.identifier([idColumn])} = ${userId}
+      where ${sql.identifier(idColumn)} = ${userId}
       limit 1
     `);
 
@@ -108,11 +108,11 @@ export async function POST(request: NextRequest) {
         update user_goals
         set calorie_goal = ${calorieGoal},
             updated_at = ${new Date()}
-        where ${sql.identifier([idColumn])} = ${userId}
+        where ${sql.identifier(idColumn)} = ${userId}
       `);
     } else {
       await db.execute(sql`
-        insert into user_goals (${sql.identifier([idColumn])}, calorie_goal, updated_at)
+        insert into user_goals (${sql.identifier(idColumn)}, calorie_goal, updated_at)
         values (${userId}, ${calorieGoal}, ${new Date()})
       `);
     }
