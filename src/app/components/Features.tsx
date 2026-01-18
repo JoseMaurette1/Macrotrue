@@ -7,11 +7,18 @@ import { useState, useRef } from "react"
 
 const features = [
   {
+    name: "Calorie Calculator",
+    description: "Gain valuable insights into your body and how much you should eat to reach your goal.",
+    icon: Calculator,
+    placeholderColor: "from-purple-500 to-pink-500",
+    videoUrl: "/calculator.mp4",
+  },
+  {
     name: "Food Recommendations",
     description: "Seamlessly choose from a variety of delicious foods while maintaining a diet.",
     icon: Apple,
     placeholderColor: "from-green-500 to-emerald-500",
-    videoUrl: "/meals.mp4",
+    videoUrl: "/meals.mp4?v=2",
   },
   {
     name: "Workout Tracker",
@@ -19,13 +26,6 @@ const features = [
     icon: Dumbbell,
     placeholderColor: "from-orange-500 to-red-500",
     videoUrl: "/workout.mp4",
-  },
-  {
-    name: "Calorie Calculator",
-    description: "Gain valuable insights into your body and how much you should eat to reach your goal.",
-    icon: Calculator,
-    placeholderColor: "from-purple-500 to-pink-500",
-    videoUrl: "/calculator.mp4",
   },
 ]
 
