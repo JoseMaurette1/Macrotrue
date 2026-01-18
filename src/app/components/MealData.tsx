@@ -16,9 +16,6 @@ interface Meal {
 }
 
 interface MealDataProps {
-  onRefresh: () => void;
-  refreshCount: number;
-  maxRefreshes: number;
   targetCalories?: number | null;
 }
 
@@ -35,14 +32,13 @@ interface AIMealResponse {
 }
 
 const MealData = ({
-  onRefresh,
-  refreshCount,
-  maxRefreshes,
   targetCalories,
 }: MealDataProps) => {
   const [aiMeals, setAiMeals] = useState<AIMealResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshCount, setRefreshCount] = useState(0);
+  const [maxRefreshes, setMaxRefreshes] = useState(5);
 
   useEffect(() => {
     const fetchMeals = async () => {
@@ -67,6 +63,12 @@ const MealData = ({
         const data = await response.json();
         if (data.breakfast && data.lunch && data.dinner) {
           setAiMeals(data);
+          if (typeof data.refreshCount === "number") {
+            setRefreshCount(data.refreshCount);
+          }
+          if (typeof data.maxRefreshes === "number") {
+            setMaxRefreshes(data.maxRefreshes);
+          }
         } else {
           throw new Error("Invalid response from meal generator");
         }
@@ -84,18 +86,31 @@ const MealData = ({
   const handleRefresh = async () => {
     if (!targetCalories || targetCalories < 1000) return;
 
-    onRefresh();
     setIsLoading(true);
 
     try {
       const response = await fetch(
-        `/api/meal-recommendations?calories=${targetCalories}`
+        `/api/meal-recommendations?calories=${targetCalories}&refresh=true`
       );
 
       if (response.ok) {
         const data = await response.json();
         if (data.breakfast && data.lunch && data.dinner) {
           setAiMeals(data);
+          if (typeof data.refreshCount === "number") {
+            setRefreshCount(data.refreshCount);
+          }
+          if (typeof data.maxRefreshes === "number") {
+            setMaxRefreshes(data.maxRefreshes);
+          }
+        }
+      } else if (response.status === 403) {
+        const data = await response.json();
+        if (typeof data.refreshCount === "number") {
+          setRefreshCount(data.refreshCount);
+        }
+        if (typeof data.maxRefreshes === "number") {
+          setMaxRefreshes(data.maxRefreshes);
         }
       }
     } catch (err) {

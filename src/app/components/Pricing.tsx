@@ -1,13 +1,24 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { useState } from "react";
 
-const plans = [
+type PlanKey = "starter" | "premium" | "pro";
+
+const plans: Array<{
+  name: string;
+  price: string;
+  planKey: PlanKey;
+  popular?: boolean;
+  features: string[];
+}> = [
   {
     name: "Starter",
     price: "Free",
+    planKey: "starter",
     features: [
       "Calorie Calculator",
       "3 Daily Recipe Recommendations",
@@ -17,6 +28,7 @@ const plans = [
   {
     name: "Premium",
     price: "$3",
+    planKey: "premium",
     popular: true,
     features: [
       "Calorie Calculator",
@@ -28,6 +40,7 @@ const plans = [
   {
     name: "Pro",
     price: "$10",
+    planKey: "pro",
     features: [
       "Calorie Calculator",
       "Unlimited Recipe Recommendations",
@@ -40,9 +53,44 @@ const plans = [
 
 export default function Pricing() {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useUser();
+  const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
 
-  const handleSignup = () => {
-    router.push("/signup");
+  const handleCheckout = async (planKey: PlanKey) => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      router.push("/signup");
+      return;
+    }
+
+    if (planKey === "starter") {
+      router.push("/Home");
+      return;
+    }
+
+    setLoadingPlan(planKey);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ plan: planKey }),
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setLoadingPlan(null);
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -142,8 +190,19 @@ export default function Pricing() {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <Button className="mt-6 w-full" onClick={handleSignup}>
-                    {plan.name === "Premium" ? "GET STARTED 💪" : "Get started"}
+                  <Button
+                    className="mt-6 w-full"
+                    onClick={() => handleCheckout(plan.planKey)}
+                    disabled={loadingPlan !== null}
+                  >
+                    {loadingPlan === plan.planKey ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    {plan.planKey === "starter"
+                      ? "Get started"
+                      : plan.popular
+                      ? "GET STARTED 💪"
+                      : "Subscribe"}
                   </Button>
                 </motion.div>
               </div>

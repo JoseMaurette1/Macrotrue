@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MealData from "../components/MealData";
+import PantryChat from "../components/PantryChat";
 import MemberHeader from "../components/MemberHeader";
 import { Card, CardContent } from "@/components/ui/card";
 
-const MAX_REFRESHES = 5;
-
 const FoodPage = () => {
   const [calories, setCalories] = useState<number | null>(null);
-  const [targetCalories, setTargetCalories] = useState<number | null>(null);
-  const [refreshCount, setRefreshCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +17,6 @@ const FoodPage = () => {
           const data = await response.json();
           if (data.calorieGoal) {
             setCalories(data.calorieGoal);
-            setTargetCalories(data.calorieGoal);
           }
         }
       } catch (error) {
@@ -33,12 +28,6 @@ const FoodPage = () => {
 
     fetchGoal();
   }, []);
-
-  const handleRefresh = () => {
-    if (refreshCount < MAX_REFRESHES) {
-      setRefreshCount((prevCount) => prevCount + 1);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -75,12 +64,10 @@ const FoodPage = () => {
             </CardContent>
           </Card>
         )}
-        <MealData
-          onRefresh={handleRefresh}
-          refreshCount={refreshCount}
-          maxRefreshes={MAX_REFRESHES}
-          targetCalories={targetCalories}
-        />
+        
+        <div className="mt-8">
+           <PantryChat />
+        </div>
       </div>
     </>
   );
