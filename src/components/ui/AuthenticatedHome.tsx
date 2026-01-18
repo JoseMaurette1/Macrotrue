@@ -50,8 +50,8 @@ function FloatingPaths({ position }: { position: number }) {
   );
 }
 
-export function BackgroundPaths({
-  title = "Background Paths",
+export function AuthenticatedHomePage({
+  title = "Hi",
 }: {
   title?: string;
 }) {
@@ -124,4 +124,4 @@ export function BackgroundPaths({
   );
 }
 
-export default BackgroundPaths;
+export default AuthenticatedHomePage;

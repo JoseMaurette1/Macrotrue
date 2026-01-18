@@ -68,15 +68,15 @@ export default function Header() {
           >
             <Link
               href="/login"
-              className="hidden sm:inline-flex text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-200"
             >
-              Log in
+              Login
             </Link>
             <Link
               href="/signup"
-              className="hidden sm:inline-flex items-center text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-full transition-colors duration-200"
+              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-200"
             >
-              Sign up <ChevronRight size={16} className="ml-1" />
+              Sign up
             </Link>
             <Button
               className="md:hidden p-2 rounded-full bg-primary hover:bg-accent/80 transition-colors duration-200"

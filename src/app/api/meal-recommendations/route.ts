@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { db } from "@/db";
+import { sql } from "drizzle-orm";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -27,18 +29,101 @@ const MEAL_SPLIT = {
   dinner: 0.40,    // 40% of daily calories
 };
 
-const SYSTEM_PROMPT = `You are a professional nutritionist. Generate 3 complete meals that sum exactly to the user's daily calorie target.
+const MAX_REFRESHES = 5;
+
+type UserIdColumn = "clerk_id" | "user_id";
+
+let cachedSubscriptionsIdColumn: UserIdColumn | null = null;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const getSubscriptionsIdColumn = async (): Promise<UserIdColumn> => {
+  if (cachedSubscriptionsIdColumn) return cachedSubscriptionsIdColumn;
+
+  const result = await db.execute(sql`
+    select column_name
+    from information_schema.columns
+    where table_name = 'subscriptions'
+      and column_name in ('clerk_id', 'user_id')
+  `);
+
+  const columnNames = new Set<string>();
+  for (const row of result.rows) {
+    if (isRecord(row) && typeof row.column_name === "string") {
+      columnNames.add(row.column_name);
+    }
+  }
+
+  cachedSubscriptionsIdColumn = columnNames.has("clerk_id")
+    ? "clerk_id"
+    : "user_id";
+
+  return cachedSubscriptionsIdColumn;
+};
+
+const getSubscription = async (userId: string) => {
+  const idColumn = await getSubscriptionsIdColumn();
+
+  const result = await db.execute(sql`
+    select id, plan, status, refresh_count
+    from subscriptions
+    where ${sql.identifier(idColumn)} = ${userId}
+    limit 1
+  `);
+
+  const row = result.rows[0];
+  if (!isRecord(row)) return null;
+
+  return {
+    id: typeof row.id === "string" ? row.id : null,
+    plan: typeof row.plan === "string" ? row.plan : "starter",
+    status: typeof row.status === "string" ? row.status : "inactive",
+    refreshCount:
+      typeof row.refresh_count === "number" ? row.refresh_count : 0,
+    idColumn,
+  };
+};
+
+const createSubscription = async (userId: string, idColumn: UserIdColumn) => {
+  const now = new Date();
+  await db.execute(sql`
+    insert into subscriptions (${sql.identifier(idColumn)}, plan, status, refresh_count, created_at, updated_at)
+    values (${userId}, 'starter', 'inactive', 0, ${now}, ${now})
+  `);
+};
+
+const updateRefreshCount = async (
+  userId: string,
+  idColumn: UserIdColumn,
+  refreshCount: number
+) => {
+  await db.execute(sql`
+    update subscriptions
+    set refresh_count = ${refreshCount},
+        updated_at = ${new Date()}
+    where ${sql.identifier(idColumn)} = ${userId}
+  `);
+};
+
+const SYSTEM_PROMPT = `You are a professional nutritionist and home chef. Generate 3 appetizing, realistic, and complete meals that sum exactly to the user's daily calorie target.
 
 IMPORTANT RULES:
-1. Each meal MUST include specific portion amounts (grams, ounces, cups, etc.)
-2. Include a protein source in every meal
-3. Use common, affordable ingredients
-4. Calculate macros accurately - they must sum to the target breakdown
-5. Return ONLY valid JSON - no markdown, no comments, no explanations
-6. Be creative with meal variety - avoid repeating similar meals
-7. Consider typical meal timing (breakfast: lighter, dinner: heartier)`;
+1. **Realistic & Appetizing**: Suggest meals people actually want to eat. Think "home-cooked comfort food" that fits macros.
+   - Example: Instead of "Boiled Chicken and Rice", suggest "Chicken Teriyaki Bowl with Jasmine Rice and Steamed Broccoli".
+   - Example: Instead of "Egg Whites", suggest "3 Whole Eggs Scrambled with Cheese and Toast".
+2. **Include Flavor**: Mention sauces, seasonings, marinades, or cooking methods (e.g., "grilled", "roasted", "garlic butter", "marinara", "soy sauce").
+3. **Specific Portions**: Must include precise amounts (grams, ounces, cups, tbsp) for ALL ingredients.
+4. **Variety**: Do NOT use the same main protein source for Lunch and Dinner (e.g., if Lunch is Chicken, Dinner should be Beef, Fish, or Turkey).
+5. **Accuracy**: Macros must be calculated accurately.
+6. **JSON Only**: Return ONLY valid JSON with no markdown.
 
-function buildUserPrompt(calories: number, preferences?: string) {
+MEAL STRUCTURE GUIDANCE:
+- Breakfast: Hearty and traditional (e.g., Eggs, Oats, Toast, Yogurt parfaits).
+- Lunch: Quick but filling (e.g., Rice bowls, Pasta dishes, Wraps, Salads with dressing).
+- Dinner: Substantial savory meal (e.g., Steak and potatoes, Pasta with meat sauce, Roast chicken with veggies).`;
+
+function buildUserPrompt(calories: number, preferences?: string, isRefresh?: boolean) {
   const protein = Math.round((calories * MACRO_SPLIT.protein) / 4); // 4 cal per gram
   const carbs = Math.round((calories * MACRO_SPLIT.carbs) / 4); // 4 cal per gram
   const fat = Math.round((calories * MACRO_SPLIT.fat) / 9); // 9 cal per gram
@@ -50,6 +135,11 @@ function buildUserPrompt(calories: number, preferences?: string) {
   const breakfastProtein = Math.round(protein * MEAL_SPLIT.breakfast);
   const lunchProtein = Math.round(protein * MEAL_SPLIT.lunch);
   const dinnerProtein = Math.round(protein * MEAL_SPLIT.dinner);
+
+  // Add random variety instruction for refreshes
+  const varietyInstruction = isRefresh
+    ? "\nIMPORTANT: The user requested a REFRESH. Do NOT provide generic meals. Give something unique and flavorful this time."
+    : "";
 
   return `DAILY TARGET: ${calories} calories
 
@@ -64,6 +154,7 @@ MEAL CALORIE BREAKDOWN:
 - Dinner: ~${dinnerCalories} cal (${dinnerProtein}g protein)
 
 ${preferences ? `USER PREFERENCES: ${preferences}` : ""}
+${varietyInstruction}
 
 REQUIREMENTS:
 - Breakfast should be around ${breakfastCalories} calories
@@ -71,6 +162,7 @@ REQUIREMENTS:
 - Dinner should be around ${dinnerCalories} calories
 - Total must equal ${calories} calories (allow +/- 50 cal variance)
 - Each meal must have at least 25g of protein
+- MAKE IT TASTY: Include sauces, spices, and realistic food pairings.
 
 JSON OUTPUT FORMAT:
 {
@@ -170,6 +262,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const calories = searchParams.get("calories");
     const preferences = searchParams.get("preferences") || undefined;
+    const isRefresh = searchParams.get("refresh") === "true";
 
     if (!calories) {
       return NextResponse.json(
@@ -183,6 +276,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: "calories must be a number between 1000 and 5000" },
         { status: 400 }
+      );
+    }
+
+    // Subscription refresh count check
+    let subscription = await getSubscription(userId);
+    if (!subscription) {
+      const idColumn = await getSubscriptionsIdColumn();
+      await createSubscription(userId, idColumn);
+      subscription = {
+        id: null,
+        plan: "starter",
+        status: "inactive",
+        refreshCount: 0,
+        idColumn,
+      };
+    }
+
+    const isPremiumUser = subscription.plan !== "starter";
+
+    if (!isPremiumUser && isRefresh && subscription.refreshCount >= MAX_REFRESHES) {
+      return NextResponse.json(
+        {
+          error: "refresh_limit_exceeded",
+          message:
+            "You've reached your refresh limit. Upgrade for unlimited refreshes.",
+          refreshCount: subscription.refreshCount,
+          maxRefreshes: MAX_REFRESHES,
+        },
+        { status: 403 }
       );
     }
 
@@ -214,9 +336,9 @@ export async function GET(request: NextRequest) {
         model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: buildUserPrompt(calorieTarget, preferences) },
+          { role: "user", content: buildUserPrompt(calorieTarget, preferences, isRefresh) },
         ],
-        temperature: 0.7,
+        temperature: 0.85,
         max_tokens: 1024,
       }),
     });
@@ -267,12 +389,21 @@ export async function GET(request: NextRequest) {
         parsed.dinner.macros.fat,
     };
 
+    // Update refresh count if needed
+    if (!isPremiumUser && isRefresh) {
+      const nextCount = subscription.refreshCount + 1;
+      await updateRefreshCount(userId, subscription.idColumn, nextCount);
+      subscription.refreshCount = nextCount;
+    }
+
     // Return with actual calculated totals
     return NextResponse.json({
       breakfast: parsed.breakfast,
       lunch: parsed.lunch,
       dinner: parsed.dinner,
       total: actualTotal,
+      refreshCount: isPremiumUser ? undefined : subscription.refreshCount,
+      maxRefreshes: isPremiumUser ? undefined : MAX_REFRESHES,
     });
   } catch (error) {
     console.error("Error generating meal recommendations:", error);

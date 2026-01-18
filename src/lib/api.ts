@@ -38,8 +38,21 @@ export const saveWorkout = async (
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error("API error:", error);
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const error = await response.json();
+        console.error("API error:", error);
+        if (error && typeof error === "object" && "error" in error) {
+          const message = (error as { error?: string }).error;
+          if (message) errorMessage = message;
+        }
+      } catch {
+        const text = await response.text();
+        if (text) {
+          errorMessage = text;
+        }
+        console.error("API error:", errorMessage);
+      }
       return false;
     }
 
