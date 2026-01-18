@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, ChefHat, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { Send, ChefHat, Sparkles, Crown, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -12,15 +13,18 @@ interface Message {
 }
 
 export default function PantryChat() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
-    { 
-      role: "assistant", 
-      content: "Hi! I'm your Pantry Chef. Tell me what ingredients you have (and any calorie targets), and I'll suggest delicious meals with full macro breakdowns! 🍳" 
+    {
+      role: "assistant",
+      content: "Hi! I'm your Pantry Chef. Tell me what ingredients you have (and any calorie targets), and I'll suggest delicious meals with full macro breakdowns! 🍳"
     }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [usage, setUsage] = useState({ count: 0, limit: 5, isPremium: false });
+  const [calorieGoal, setCalorieGoal] = useState<number | null>(null);
+  const [showUpgradePopup, setShowUpgradePopup] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -30,6 +34,42 @@ export default function PantryChat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Fetch calorie goal and usage on mount
+  useEffect(() => {
+    const fetchGoal = async () => {
+      try {
+        const response = await fetch("/api/goals");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.calorieGoal) {
+            setCalorieGoal(data.calorieGoal);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch calorie goal:", error);
+      }
+    };
+
+    const fetchUsage = async () => {
+      try {
+        const response = await fetch("/api/chat");
+        if (response.ok) {
+          const data = await response.json();
+          setUsage({
+            count: data.chatCount || 0,
+            limit: data.limit || 5,
+            isPremium: data.isPremium || false
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch usage:", error);
+      }
+    };
+
+    fetchGoal();
+    fetchUsage();
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -41,25 +81,28 @@ export default function PantryChat() {
 
     try {
       // Send context (last few messages) + current message
-      const contextMessages = messages.filter(m => m.role !== "system").slice(-6); 
-      // Filter out the initial welcome message from API context if needed, but it's fine to keep
-      
-      const payload = [...contextMessages, userMsg];
+      const contextMessages = messages.filter(m => m.role !== "system").slice(-6);
+
+      const payload = {
+        messages: [...contextMessages, userMsg],
+        calorieGoal: calorieGoal
+      };
 
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: payload }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         if (data.error === "limit_exceeded") {
-           setMessages((prev) => [...prev, { 
-             role: "assistant", 
-             content: `⛔ **Limit Reached**\n\nYou've used ${data.chatCount}/${data.limit} free messages today. Upgrade to Premium for unlimited chat!` 
-           }]);
+          setShowUpgradePopup(true);
+          setMessages((prev) => [...prev, {
+            role: "assistant",
+            content: `⛔ **Limit Reached**\n\nYou've used ${data.chatCount}/${data.limit} free messages today. Upgrade to Premium for unlimited chat!`
+          }]);
         } else {
            throw new Error(data.error || "Failed to fetch");
         }
@@ -155,6 +198,68 @@ export default function PantryChat() {
           </Button>
         </form>
       </div>
+
+      {/* Upgrade Popup Modal */}
+      <AnimatePresence>
+        {showUpgradePopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowUpgradePopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-background rounded-2xl shadow-2xl max-w-md w-full p-6 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowUpgradePopup(false)}
+                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Crown className="h-8 w-8 text-primary" />
+                </div>
+
+                <h2 className="text-2xl font-bold text-foreground mb-2">
+                  Unlock Extended AI Chef
+                </h2>
+
+                <p className="text-muted-foreground mb-6">
+                  You&apos;ve reached your daily limit of free meal suggestions.
+                  Upgrade to Premium for extended access to your personal AI chef!
+                </p>
+
+                <div className="space-y-3 w-full">
+                  <Button
+                    onClick={() => router.push("/Pricing")}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <Crown className="h-4 w-4 mr-2" />
+                    Upgrade to Premium
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowUpgradePopup(false)}
+                    className="w-full"
+                  >
+                    Maybe Later
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
