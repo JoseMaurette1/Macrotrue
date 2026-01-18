@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { getSubscriptionsIdColumn, type UserIdColumn } from "@/lib/db-helper";
+import { isRecord, isSameDay } from "@/lib/utils";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -46,6 +47,44 @@ IMPORTANT: Always calculate portion sizes precisely so the meal calories match t
 // Daily limit for non-premium users
 const DAILY_CHAT_LIMIT = 5;
 
+const getSubscription = async (userId: string) => {
+  const idColumn = await getSubscriptionsIdColumn();
+  
+  const result = await db.execute(sql`
+    select id, plan, chat_count, updated_at
+    from subscriptions
+    where ${sql.identifier(idColumn)} = ${userId}
+    limit 1
+  `);
+
+  const row = result.rows[0];
+  if (!isRecord(row)) return null;
+
+  return {
+    id: typeof row.id === "string" ? row.id : null,
+    plan: typeof row.plan === "string" ? row.plan : "starter",
+    chatCount: typeof row.chat_count === "number" ? row.chat_count : 0,
+    updatedAt: row.updated_at instanceof Date ? row.updated_at : new Date(row.updated_at as string),
+    idColumn
+  };
+};
+
+const createSubscription = async (userId: string, idColumn: UserIdColumn) => {
+  const now = new Date();
+  await db.execute(sql`
+    insert into subscriptions (${sql.identifier(idColumn)}, plan, status, chat_count, created_at, updated_at)
+    values (${userId}, 'starter', 'active', 0, ${now}, ${now})
+  `);
+  
+  return {
+    id: null,
+    plan: "starter",
+    chatCount: 0,
+    updatedAt: now,
+    idColumn
+  };
+};
+
 export async function GET() {
   try {
     const { userId } = await auth();
@@ -54,18 +93,12 @@ export async function GET() {
     }
 
     // Get or create subscription
-    let userSub = await db.query.subscriptions.findFirst({
-      where: eq(subscriptions.clerkId, userId),
-    });
+    let userSub = await getSubscription(userId);
 
     if (!userSub) {
       try {
-        const [newSub] = await db.insert(subscriptions).values({
-          clerkId: userId,
-          plan: "starter",
-          chatCount: 0,
-        }).returning();
-        userSub = newSub;
+        const idColumn = await getSubscriptionsIdColumn();
+        userSub = await createSubscription(userId, idColumn);
       } catch (e) {
         console.error("Error creating subscription:", e);
         // Return default values if DB fails
@@ -121,19 +154,13 @@ export async function POST(request: NextRequest) {
 
     // Check Subscription & Chat Limit
     // We try to find the subscription
-    let userSub = await db.query.subscriptions.findFirst({
-      where: eq(subscriptions.clerkId, userId),
-    });
+    let userSub = await getSubscription(userId);
 
     // If no subscription, create one
     if (!userSub) {
       try {
-        const [newSub] = await db.insert(subscriptions).values({
-            clerkId: userId,
-            plan: "starter",
-            chatCount: 0,
-        }).returning();
-        userSub = newSub;
+        const idColumn = await getSubscriptionsIdColumn();
+        userSub = await createSubscription(userId, idColumn);
       } catch (e) {
         console.error("Error creating subscription:", e);
         // Continue, might be a DB issue, but we let them chat for now or fail?
@@ -143,7 +170,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Check limit
-    if (userSub && userSub.plan === "starter" && userSub.chatCount >= DAILY_CHAT_LIMIT) {
+    if (userSub && userSub.plan === "starter") {
+      const now = new Date();
+      if (!isSameDay(now, userSub.updatedAt)) {
+        userSub.chatCount = 0;
+      }
+
+      if (userSub.chatCount >= DAILY_CHAT_LIMIT) {
        return NextResponse.json(
         { 
           error: "limit_exceeded", 
@@ -153,6 +186,7 @@ export async function POST(request: NextRequest) {
         },
         { status: 403 }
       );
+     }
     }
 
     // Construct messages for Groq
@@ -198,12 +232,24 @@ export async function POST(request: NextRequest) {
     const completion = await response.json();
     const reply = completion.choices?.[0]?.message?.content;
 
+    if (!reply) {
+      throw new Error("Invalid response from Groq API: missing content");
+    }
+
     // Increment chat count
     if (userSub && userSub.plan === "starter") {
       try {
-        await db.update(subscriptions)
-          .set({ chatCount: (userSub.chatCount || 0) + 1 })
-          .where(eq(subscriptions.clerkId, userId));
+        const newCount = (userSub.chatCount || 0) + 1;
+        const now = new Date();
+        
+        await db.execute(sql`
+          update subscriptions
+          set chat_count = ${newCount},
+              updated_at = ${now}
+          where ${sql.identifier(userSub.idColumn)} = ${userId}
+        `);
+        
+        userSub.chatCount = newCount;
       } catch (e) {
         console.error("Error updating chat count:", e);
       }
@@ -211,7 +257,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       reply,
-      chatCount: userSub ? (userSub.chatCount + 1) : 1,
+      chatCount: userSub ? userSub.chatCount : 1,
       limit: DAILY_CHAT_LIMIT,
       isPremium: userSub?.plan !== "starter"
     });

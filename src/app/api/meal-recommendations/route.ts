@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
+import { getSubscriptionsIdColumn, type UserIdColumn } from "@/lib/db-helper";
+import { isRecord } from "@/lib/utils";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -30,37 +32,6 @@ const MEAL_SPLIT = {
 };
 
 const MAX_REFRESHES = 5;
-
-type UserIdColumn = "clerk_id" | "user_id";
-
-let cachedSubscriptionsIdColumn: UserIdColumn | null = null;
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const getSubscriptionsIdColumn = async (): Promise<UserIdColumn> => {
-  if (cachedSubscriptionsIdColumn) return cachedSubscriptionsIdColumn;
-
-  const result = await db.execute(sql`
-    select column_name
-    from information_schema.columns
-    where table_name = 'subscriptions'
-      and column_name in ('clerk_id', 'user_id')
-  `);
-
-  const columnNames = new Set<string>();
-  for (const row of result.rows) {
-    if (isRecord(row) && typeof row.column_name === "string") {
-      columnNames.add(row.column_name);
-    }
-  }
-
-  cachedSubscriptionsIdColumn = columnNames.has("clerk_id")
-    ? "clerk_id"
-    : "user_id";
-
-  return cachedSubscriptionsIdColumn;
-};
 
 const getSubscription = async (userId: string) => {
   const idColumn = await getSubscriptionsIdColumn();
