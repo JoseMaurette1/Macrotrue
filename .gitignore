@@ -21,6 +21,10 @@
 # production
 /build
 
+# interview file
+/interview.md
+/docs/interview.md
+
 # misc
 .DS_Store
 *.pem

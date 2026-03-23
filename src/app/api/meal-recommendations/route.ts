@@ -4,9 +4,14 @@ import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { getSubscriptionsIdColumn, type UserIdColumn } from "@/lib/db-helper";
 import { isRecord } from "@/lib/utils";
+import { createLogger } from "@/lib/logger";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+// llama-3.3-70b-versatile pricing (USD per token) — update if Groq changes pricing
+const GROQ_PRICE_PER_INPUT_TOKEN = 0.00000059;
+const GROQ_PRICE_PER_OUTPUT_TOKEN = 0.00000079;
 
 // Rate limiting - simple in-memory store (use Redis for production)
 interface RateLimitEntry {
@@ -223,11 +228,17 @@ function validateResponse(data: unknown): data is MealRecommendations {
 }
 
 export async function GET(request: NextRequest) {
+  const correlationId = crypto.randomUUID();
+  const log = createLogger(correlationId);
+  const headers = { "X-Correlation-Id": correlationId };
+  const start = Date.now();
+  let userId: string | null = null;
+
   try {
     // Check authentication
-    const { userId } = await auth();
+    ({ userId } = await auth());
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers });
     }
 
     const { searchParams } = new URL(request.url);
@@ -238,7 +249,7 @@ export async function GET(request: NextRequest) {
     if (!calories) {
       return NextResponse.json(
         { error: "calories parameter is required" },
-        { status: 400 }
+        { status: 400, headers }
       );
     }
 
@@ -246,9 +257,16 @@ export async function GET(request: NextRequest) {
     if (isNaN(calorieTarget) || calorieTarget < 1000 || calorieTarget > 5000) {
       return NextResponse.json(
         { error: "calories must be a number between 1000 and 5000" },
-        { status: 400 }
+        { status: 400, headers }
       );
     }
+
+    log.info("meal_rec.request", {
+      userId,
+      calorieTarget,
+      isRefresh,
+      hasPreferences: !!preferences,
+    });
 
     // Subscription refresh count check
     let subscription = await getSubscription(userId);
@@ -267,6 +285,11 @@ export async function GET(request: NextRequest) {
     const isPremiumUser = subscription.plan !== "starter";
 
     if (!isPremiumUser && isRefresh && subscription.refreshCount >= MAX_REFRESHES) {
+      log.warn("meal_rec.refresh_limit_exceeded", {
+        userId,
+        refreshCount: subscription.refreshCount,
+        maxRefreshes: MAX_REFRESHES,
+      });
       return NextResponse.json(
         {
           error: "refresh_limit_exceeded",
@@ -275,7 +298,7 @@ export async function GET(request: NextRequest) {
           refreshCount: subscription.refreshCount,
           maxRefreshes: MAX_REFRESHES,
         },
-        { status: 403 }
+        { status: 403, headers }
       );
     }
 
@@ -286,9 +309,10 @@ export async function GET(request: NextRequest) {
 
     if (entry && now < entry.resetTime) {
       if (entry.count >= RATE_LIMIT_MAX) {
+        log.warn("meal_rec.rate_limited", { userId, ip: clientIp });
         return NextResponse.json(
           { error: "Rate limit exceeded. Please try again later." },
-          { status: 429 }
+          { status: 429, headers }
         );
       }
       entry.count++;
@@ -297,6 +321,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Call Groq API using fetch
+    const groqStart = Date.now();
     const response = await fetch(GROQ_API_URL, {
       method: "POST",
       headers: {
@@ -314,14 +339,28 @@ export async function GET(request: NextRequest) {
       }),
     });
 
+    const groqLatencyMs = Date.now() - groqStart;
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Groq API error:", errorText);
+      log.error("meal_rec.groq_error", {
+        userId,
+        status: response.status,
+        groqLatencyMs,
+        body: errorText.slice(0, 200),
+      });
       throw new Error(`Groq API error: ${response.status}`);
     }
 
+    log.info("meal_rec.groq_response", { userId, status: response.status, groqLatencyMs });
+
     const completion = await response.json();
     const content = completion.choices?.[0]?.message?.content;
+    const usage = completion.usage as {
+      prompt_tokens?: number;
+      completion_tokens?: number;
+      total_tokens?: number;
+    } | undefined;
     if (!content) {
       throw new Error("No content in Groq response");
     }
@@ -330,13 +369,14 @@ export async function GET(request: NextRequest) {
     // Sometimes the model wraps JSON in markdown code blocks
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      log.error("meal_rec.parse_error", { userId, content: content.slice(0, 200) });
       throw new Error("No JSON found in response");
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
 
     if (!validateResponse(parsed)) {
-      console.error("Invalid response structure:", parsed);
+      log.error("meal_rec.invalid_structure", { userId, parsed: JSON.stringify(parsed).slice(0, 200) });
       throw new Error("Invalid response structure from Groq");
     }
 
@@ -367,6 +407,23 @@ export async function GET(request: NextRequest) {
       subscription.refreshCount = nextCount;
     }
 
+    const estimatedCostUsd = usage?.prompt_tokens !== undefined && usage?.completion_tokens !== undefined
+      ? (usage.prompt_tokens * GROQ_PRICE_PER_INPUT_TOKEN) + (usage.completion_tokens * GROQ_PRICE_PER_OUTPUT_TOKEN)
+      : undefined;
+
+    log.info("meal_rec.success", {
+      userId,
+      calorieTarget,
+      actualCalories: actualTotal.calories,
+      groqLatencyMs,
+      totalLatencyMs: Date.now() - start,
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens,
+      totalTokens: usage?.total_tokens,
+      estimatedCostUsd,
+      refreshCount: isPremiumUser ? undefined : subscription.refreshCount,
+    });
+
     // Return with actual calculated totals
     return NextResponse.json({
       breakfast: parsed.breakfast,
@@ -375,9 +432,13 @@ export async function GET(request: NextRequest) {
       total: actualTotal,
       refreshCount: isPremiumUser ? undefined : subscription.refreshCount,
       maxRefreshes: isPremiumUser ? undefined : MAX_REFRESHES,
-    });
+    }, { headers });
   } catch (error) {
-    console.error("Error generating meal recommendations:", error);
+    log.error("meal_rec.unhandled_error", {
+      userId,
+      error: String(error),
+      totalLatencyMs: Date.now() - start,
+    });
 
     // Return a fallback error - frontend will handle static fallback
     return NextResponse.json(
@@ -385,7 +446,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to generate meal recommendations",
         fallback: true,
       },
-      { status: 500 }
+      { status: 500, headers }
     );
   }
 }
