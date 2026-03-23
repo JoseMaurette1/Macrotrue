@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, ChefHat, Sparkles, Crown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -158,7 +159,13 @@ export default function PantryChat() {
                   : "bg-white dark:bg-muted text-foreground rounded-tl-none border"
               }`}
             >
-              <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+              {msg.role === "user" ? (
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+              ) : (
+                <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </motion.div>
         ))}
