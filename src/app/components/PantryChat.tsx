@@ -196,7 +196,7 @@ export default function PantryChat() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="I have chicken, rice, and broccoli..."
+            placeholder="I have chicken, beef, and eggs or Give me some fun recipes!"
             className="flex-1"
             disabled={isLoading}
           />
